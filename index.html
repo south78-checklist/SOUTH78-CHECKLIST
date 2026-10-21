@@ -58,7 +58,7 @@ button {
     margin: auto;
     display: flex;
     align-items: center;
-    gap: 0px;
+    gap: 0;
 }
 
 .logo {
@@ -411,10 +411,6 @@ textarea {
     letter-spacing: .5px;
 }
 
-.hidden {
-    display: none !important;
-}
-
 @media (max-width: 900px) {
     .equipment-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -501,7 +497,7 @@ textarea {
 <header class="header">
     <div class="header-inner">
         <div class="logo">
-            <img src="./logo south78.jpg" alt="Logo SOUTH78">
+            <img src="./logo%20south78.jpg" alt="Logo SOUTH78">
         </div>
 
         <div class="brand">
@@ -556,16 +552,11 @@ textarea {
                 <div class="equipment-icon">〰</div>
                 <h4>Kipas</h4>
                 <p>Pemeriksaan kipas berdasarkan area operasional.</p>
-
                 <div class="floor-buttons">
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Kipas GF')">GF</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Kipas MZ')">MZ</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Kipas UG')">UG</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Kipas Lantai 1')">Lantai 1</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas GF')">GF</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas MZ')">MZ</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas UG')">UG</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas Lantai 1')">Lantai 1</button>
                 </div>
             </article>
 
@@ -573,16 +564,11 @@ textarea {
                 <div class="equipment-icon">⇅</div>
                 <h4>Eskalator</h4>
                 <p>Pemeriksaan berdasarkan jalur penghubung lantai.</p>
-
                 <div class="floor-buttons">
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Eskalator GF–MZ')">GF–MZ</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Eskalator MZ–UG')">MZ–UG</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Eskalator UG–Lantai 1')">UG–Lantai 1</button>
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Eskalator Lantai 1–2')">Lantai 1–2</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator GF–MZ')">GF–MZ</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator MZ–UG')">MZ–UG</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator UG–Lantai 1')">UG–Lantai 1</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator Lantai 1–2')">Lantai 1–2</button>
                 </div>
             </article>
 
@@ -590,10 +576,8 @@ textarea {
                 <div class="equipment-icon">≋</div>
                 <h4>Exhaust</h4>
                 <p>Pemeriksaan kondisi dan pengoperasian exhaust.</p>
-
                 <div class="floor-buttons">
-                    <button class="btn btn-light"
-                        onclick="pilihPeralatan('Exhaust B2')">Exhaust B2</button>
+                    <button class="btn btn-light" onclick="pilihPeralatan('Exhaust B2')">Exhaust B2</button>
                 </div>
             </article>
 
@@ -612,9 +596,7 @@ textarea {
         <div class="section-heading" style="margin-top:0">
             <div>
                 <h3>Riwayat Pemeriksaan</h3>
-                <p class="subtitle">
-                    Catatan pemeriksaan yang telah disimpan.
-                </p>
+                <p class="subtitle">Catatan pemeriksaan yang telah disimpan.</p>
             </div>
             <button class="btn btn-teal" onclick="tampilkanRiwayat()">
                 Muat Riwayat
@@ -648,12 +630,24 @@ const daftarPetugas = [
 
 let peralatanAktif = "";
 
+// Daftar tujuan QR Code untuk setiap peralatan
+const daftarLinkPeralatan = {
+    "kipas-gf": "Kipas GF",
+    "kipas-mz": "Kipas MZ",
+    "kipas-ug": "Kipas UG",
+    "kipas-lantai-1": "Kipas Lantai 1",
+    "eskalator-gf-mz": "Eskalator GF–MZ",
+    "eskalator-mz-ug": "Eskalator MZ–UG",
+    "eskalator-ug-lantai-1": "Eskalator UG–Lantai 1",
+    "eskalator-lantai-1-2": "Eskalator Lantai 1–2",
+    "exhaust-b2": "Exhaust B2"
+};
+
 function bacaRiwayat() {
     try {
         const data = JSON.parse(
             localStorage.getItem("riwayatPemeriksaan") || "[]"
         );
-
         return Array.isArray(data) ? data : [];
     } catch (error) {
         return [];
@@ -711,10 +705,14 @@ function pilihPeralatan(nama) {
         ];
     }
 
-    let pilihanNama = '<option value="">-- Pilih nama petugas --</option>';
+    let pilihanNama =
+        '<option value="">-- Pilih nama petugas --</option>';
 
     daftarPetugas.forEach(petugas => {
-        pilihanNama += `<option value="${petugas}">${petugas}</option>`;
+        const option = document.createElement("option");
+        option.value = petugas;
+        option.textContent = petugas;
+        pilihanNama += option.outerHTML;
     });
 
     let daftarPoin = "";
@@ -909,10 +907,8 @@ function tampilkanRiwayat() {
 
             data.pemeriksaan.forEach(poin => {
                 const baris = document.createElement("li");
-
                 baris.textContent =
                     (poin.selesai ? "✓ " : "○ ") + poin.nama;
-
                 baris.style.margin = "7px 0";
                 daftar.appendChild(baris);
             });
@@ -924,7 +920,18 @@ function tampilkanRiwayat() {
     });
 }
 
+// Jalankan saat halaman dibuka
 perbaruiDashboard();
+tampilkanRiwayat();
+
+// Jika URL berisi parameter QR, langsung buka checklist yang sesuai
+const parameterAlat = new URLSearchParams(
+    window.location.search
+).get("alat");
+
+if (parameterAlat && daftarLinkPeralatan[parameterAlat]) {
+    pilihPeralatan(daftarLinkPeralatan[parameterAlat]);
+}
 </script>
 
 </body>
