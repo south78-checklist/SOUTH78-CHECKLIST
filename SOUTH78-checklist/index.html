@@ -1,0 +1,931 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOUTH78 | Building Management</title>
+
+<style>
+:root {
+    --dark: #39312F;
+    --dark2: #514542;
+    --teal: #A8DCD8;
+    --teal-dark: #477D78;
+    --bg: #F7F6F2;
+    --white: #FFFFFF;
+    --text: #332F2D;
+    --muted: #827B75;
+    --border: #E8E3DC;
+    --green: #27835B;
+    --red: #C44343;
+    --yellow: #A66B15;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+button, select, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.header {
+    background: var(--dark);
+    color: white;
+    padding: 22px 5%;
+    border-bottom: 5px solid var(--teal);
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 0px;
+}
+
+.logo {
+    width: 100px;
+    height: 65px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.logo img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
+.brand h1 {
+    margin: 0 0 5px;
+    font-size: 25px;
+    letter-spacing: 2px;
+}
+
+.brand p {
+    margin: 0;
+    color: #D6D0CA;
+    font-size: 11px;
+    letter-spacing: 2px;
+}
+
+.header-tag {
+    margin-left: auto;
+    border: 1px solid #746B65;
+    padding: 9px 13px;
+    border-radius: 20px;
+    color: var(--teal);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 28px auto;
+    padding: 0 22px 40px;
+}
+
+.welcome {
+    margin-bottom: 25px;
+}
+
+.eyebrow {
+    color: var(--teal-dark);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+h2 {
+    margin: 8px 0;
+    font-size: 26px;
+    letter-spacing: -.5px;
+}
+
+.subtitle {
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 28px;
+}
+
+.stat {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 19px;
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.stat-number {
+    font-size: 29px;
+    font-weight: bold;
+    margin: 13px 0 5px;
+}
+
+.stat-note {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 28px 0 15px;
+}
+
+.section-heading h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.small-note {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.equipment-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color .2s, transform .2s;
+}
+
+.equipment-card:hover {
+    border-color: var(--teal-dark);
+    transform: translateY(-2px);
+}
+
+.equipment-icon {
+    width: 46px;
+    height: 46px;
+    background: #E4F3F1;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 23px;
+    margin-bottom: 15px;
+}
+
+.equipment-card h4 {
+    font-size: 17px;
+    margin: 0 0 7px;
+}
+
+.equipment-card p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 0 0 15px;
+}
+
+.floor-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 14px;
+    background: var(--dark);
+    color: white;
+    font-weight: 600;
+    font-size: 12px;
+    transition: .2s;
+}
+
+.btn:hover {
+    background: var(--dark2);
+}
+
+.btn-teal {
+    background: var(--teal);
+    color: var(--dark);
+}
+
+.btn-teal:hover {
+    background: #90CBC6;
+}
+
+.btn-light {
+    background: #F0EEEA;
+    color: var(--dark);
+}
+
+.btn-light:hover {
+    background: #E5E1DB;
+}
+
+.btn-danger {
+    background: #FBE9E7;
+    color: #A52D2D;
+}
+
+.panel {
+    margin-top: 25px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.panel h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 700;
+    margin: 18px 0 8px;
+}
+
+select, textarea {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border: 1px solid #D8D2CA;
+    border-radius: 8px;
+    color: var(--text);
+}
+
+textarea {
+    resize: vertical;
+}
+
+.check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    margin: 8px 0;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    line-height: 1.5;
+    background: #FDFCF9;
+}
+
+.check-item input {
+    margin-top: 3px;
+    accent-color: var(--teal-dark);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.status-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.status-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    line-height: 1.5;
+}
+
+.status-option input {
+    margin-top: 3px;
+    accent-color: var(--teal-dark);
+    flex-shrink: 0;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 20px;
+}
+
+.message {
+    margin-top: 12px;
+    color: var(--teal-dark);
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+.history-item {
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 17px;
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+}
+
+.history-item h4 {
+    margin: 0 0 12px;
+    font-size: 16px;
+}
+
+.history-item p {
+    margin: 7px 0;
+    line-height: 1.5;
+}
+
+.history-status {
+    display: inline-block;
+    background: #E4F3F1;
+    color: #315E5A;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-alert {
+    background: #FCE9E7;
+    color: #A52D2D;
+}
+
+.status-repair {
+    background: #FFF2D8;
+    color: #8B5A0A;
+}
+
+.empty {
+    color: var(--muted);
+    background: #FAF9F6;
+    border-radius: 9px;
+    padding: 20px;
+    text-align: center;
+    line-height: 1.7;
+}
+
+.footer {
+    border-top: 1px solid var(--border);
+    padding: 22px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: .5px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .equipment-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .header-tag {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .header {
+        padding: 18px 14px;
+    }
+
+    .header-inner {
+        gap: 12px;
+    }
+
+    .logo {
+        width: 100px;
+        height: 52px;
+    }
+
+    .brand h1 {
+        font-size: 20px;
+        letter-spacing: 1px;
+    }
+
+    .brand p {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .container {
+        padding: 0 14px 28px;
+        margin-top: 22px;
+    }
+
+    h2 {
+        font-size: 23px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .stat {
+        padding: 14px 17px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        margin: 8px 0 4px;
+    }
+
+    .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .equipment-card {
+        padding: 17px;
+    }
+
+    .status-options {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        padding: 17px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">
+            <img src="./logo south78.jpg" alt="Logo SOUTH78">
+        </div>
+
+        <div class="brand">
+            <h1>SOUTH78</h1>
+            <p>BUILDING MANAGEMENT</p>
+        </div>
+
+        <div class="header-tag">OPERATIONAL CHECKLIST</div>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <div class="eyebrow">Building Operations System</div>
+        <h2>Operational Dashboard</h2>
+        <p class="subtitle">
+            Sistem pencatatan pemeriksaan peralatan operasional
+            Building Management SOUTH78.
+        </p>
+    </section>
+
+    <section class="stats">
+        <div class="stat">
+            <div class="stat-label">Total Pemeriksaan</div>
+            <div class="stat-number" id="totalPemeriksaan">0</div>
+            <div class="stat-note">Seluruh catatan di browser ini</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-label">Status Normal</div>
+            <div class="stat-number" id="totalNormal">0</div>
+            <div class="stat-note">Pemeriksaan berstatus normal</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-label">Perlu Perhatian</div>
+            <div class="stat-number" id="totalMasalah">0</div>
+            <div class="stat-note">Gangguan atau perbaikan</div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-heading">
+            <h3>Peralatan Operasional</h3>
+            <span class="small-note">Pilih peralatan untuk memulai checklist</span>
+        </div>
+
+        <div class="equipment-grid">
+
+            <article class="equipment-card">
+                <div class="equipment-icon">〰</div>
+                <h4>Kipas</h4>
+                <p>Pemeriksaan kipas berdasarkan area operasional.</p>
+
+                <div class="floor-buttons">
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Kipas GF')">GF</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Kipas MZ')">MZ</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Kipas UG')">UG</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Kipas Lantai 1')">Lantai 1</button>
+                </div>
+            </article>
+
+            <article class="equipment-card">
+                <div class="equipment-icon">⇅</div>
+                <h4>Eskalator</h4>
+                <p>Pemeriksaan berdasarkan jalur penghubung lantai.</p>
+
+                <div class="floor-buttons">
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Eskalator GF–MZ')">GF–MZ</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Eskalator MZ–UG')">MZ–UG</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Eskalator UG–Lantai 1')">UG–Lantai 1</button>
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Eskalator Lantai 1–2')">Lantai 1–2</button>
+                </div>
+            </article>
+
+            <article class="equipment-card">
+                <div class="equipment-icon">≋</div>
+                <h4>Exhaust</h4>
+                <p>Pemeriksaan kondisi dan pengoperasian exhaust.</p>
+
+                <div class="floor-buttons">
+                    <button class="btn btn-light"
+                        onclick="pilihPeralatan('Exhaust B2')">Exhaust B2</button>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <section class="panel" id="panelChecklist">
+        <h3 id="judulChecklist">Checklist Pemeriksaan</h3>
+        <p class="subtitle" id="petunjukChecklist">
+            Pilih salah satu peralatan di atas untuk memulai pemeriksaan.
+        </p>
+        <div id="areaChecklist"></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading" style="margin-top:0">
+            <div>
+                <h3>Riwayat Pemeriksaan</h3>
+                <p class="subtitle">
+                    Catatan pemeriksaan yang telah disimpan.
+                </p>
+            </div>
+            <button class="btn btn-teal" onclick="tampilkanRiwayat()">
+                Muat Riwayat
+            </button>
+        </div>
+
+        <p class="small-note" id="pesanRiwayat"></p>
+
+        <div id="riwayatPemeriksaan">
+            <div class="empty">
+                Tekan "Muat Riwayat" untuk melihat catatan pemeriksaan.
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    SOUTH78 · BUILDING MANAGEMENT · OPERATIONAL CHECKLIST
+</footer>
+
+<script>
+const daftarPetugas = [
+    "Trisman (SPV)",
+    "Agus",
+    "Dede",
+    "Sohib",
+    "Andrean",
+    "Zidane"
+];
+
+let peralatanAktif = "";
+
+function bacaRiwayat() {
+    try {
+        const data = JSON.parse(
+            localStorage.getItem("riwayatPemeriksaan") || "[]"
+        );
+
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function perbaruiDashboard() {
+    const riwayat = bacaRiwayat();
+
+    document.getElementById("totalPemeriksaan").textContent =
+        riwayat.length;
+
+    document.getElementById("totalNormal").textContent =
+        riwayat.filter(item => item.status === "Normal").length;
+
+    document.getElementById("totalMasalah").textContent =
+        riwayat.filter(item => item.status !== "Normal").length;
+}
+
+function pilihPeralatan(nama) {
+    peralatanAktif = nama;
+
+    document.getElementById("judulChecklist").textContent =
+        "Checklist " + nama;
+
+    document.getElementById("petunjukChecklist").textContent =
+        "Pilih petugas, periksa setiap poin, lalu simpan hasil pemeriksaan.";
+
+    const area = document.getElementById("areaChecklist");
+    let pemeriksaan = [];
+
+    if (nama.startsWith("Kipas")) {
+        pemeriksaan = [
+            "Kondisi fisik kipas baik",
+            "Kipas menyala sesuai jadwal operasional",
+            "Putaran kipas normal",
+            "Tidak ada suara abnormal",
+            "Area sekitar kipas aman"
+        ];
+    } else if (nama.startsWith("Eskalator")) {
+        pemeriksaan = [
+            "Kondisi visual eskalator baik",
+            "Eskalator beroperasi sesuai jadwal",
+            "Tidak ada suara abnormal",
+            "Handrail bergerak normal",
+            "Anak tangga bergerak normal",
+            "Area masuk dan keluar aman"
+        ];
+    } else if (nama.startsWith("Exhaust")) {
+        pemeriksaan = [
+            "Kondisi fisik exhaust baik",
+            "Exhaust beroperasi sesuai jadwal",
+            "Tidak ada suara atau getaran abnormal",
+            "Area sekitar exhaust aman"
+        ];
+    }
+
+    let pilihanNama = '<option value="">-- Pilih nama petugas --</option>';
+
+    daftarPetugas.forEach(petugas => {
+        pilihanNama += `<option value="${petugas}">${petugas}</option>`;
+    });
+
+    let daftarPoin = "";
+
+    pemeriksaan.forEach((item, index) => {
+        daftarPoin += `
+            <label class="check-item">
+                <input type="checkbox" id="cek${index}">
+                <span>${item}</span>
+            </label>
+        `;
+    });
+
+    area.innerHTML = `
+        <label class="form-label" for="namaPetugas">Nama Petugas</label>
+        <select id="namaPetugas">${pilihanNama}</select>
+
+        <label class="form-label">Poin Pemeriksaan</label>
+        ${daftarPoin}
+
+        <label class="form-label">Status Keseluruhan</label>
+        <div class="status-options">
+            <label class="status-option">
+                <input type="radio" name="status" value="Normal" checked>
+                <span>Normal</span>
+            </label>
+
+            <label class="status-option">
+                <input type="radio" name="status" value="Tidak beroperasi">
+                <span>Tidak menyala / tidak beroperasi</span>
+            </label>
+
+            <label class="status-option">
+                <input type="radio" name="status" value="Dalam perbaikan">
+                <span>Dalam perbaikan / sengaja dimatikan</span>
+            </label>
+        </div>
+
+        <label class="form-label" for="catatan">Catatan Kendala</label>
+        <textarea id="catatan" rows="4"
+            placeholder="Tuliskan kendala jika ada..."></textarea>
+
+        <div class="form-actions">
+            <button class="btn btn-teal" onclick="simpanPemeriksaan()">
+                Simpan Pemeriksaan
+            </button>
+            <button class="btn btn-light" onclick="batalPemeriksaan()">
+                Batal
+            </button>
+        </div>
+
+        <p class="message" id="hasilSimpan" role="status"></p>
+    `;
+
+    document.getElementById("panelChecklist").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+function batalPemeriksaan() {
+    peralatanAktif = "";
+
+    document.getElementById("judulChecklist").textContent =
+        "Checklist Pemeriksaan";
+
+    document.getElementById("petunjukChecklist").textContent =
+        "Pilih salah satu peralatan di atas untuk memulai pemeriksaan.";
+
+    document.getElementById("areaChecklist").innerHTML = "";
+}
+
+function simpanPemeriksaan() {
+    if (!peralatanAktif) {
+        alert("Silakan pilih peralatan terlebih dahulu.");
+        return;
+    }
+
+    const namaPetugas = document.getElementById("namaPetugas").value;
+
+    if (!namaPetugas) {
+        alert("Silakan pilih nama petugas terlebih dahulu.");
+        return;
+    }
+
+    const statusDipilih = document.querySelector(
+        '#areaChecklist input[name="status"]:checked'
+    );
+
+    const daftarCentang = document.querySelectorAll(
+        '#areaChecklist input[type="checkbox"]'
+    );
+
+    const hasilPoin = [];
+
+    daftarCentang.forEach(checkbox => {
+        hasilPoin.push({
+            nama: checkbox.nextElementSibling.textContent.trim(),
+            selesai: checkbox.checked
+        });
+    });
+
+    const dataBaru = {
+        id: Date.now(),
+        peralatan: "Checklist " + peralatanAktif,
+        petugas: namaPetugas,
+        status: statusDipilih.value,
+        catatan: document.getElementById("catatan").value.trim()
+            || "Tidak ada catatan",
+        waktu: new Date().toLocaleString("id-ID"),
+        pemeriksaan: hasilPoin
+    };
+
+    const riwayat = bacaRiwayat();
+    riwayat.push(dataBaru);
+
+    try {
+        localStorage.setItem(
+            "riwayatPemeriksaan",
+            JSON.stringify(riwayat)
+        );
+
+        document.getElementById("hasilSimpan").textContent =
+            "Pemeriksaan berhasil disimpan.";
+
+        perbaruiDashboard();
+        tampilkanRiwayat();
+    } catch (error) {
+        document.getElementById("hasilSimpan").textContent =
+            "Gagal menyimpan. Penyimpanan browser mungkin penuh.";
+    }
+}
+
+function tampilkanRiwayat() {
+    const area = document.getElementById("riwayatPemeriksaan");
+    const pesan = document.getElementById("pesanRiwayat");
+    const riwayat = bacaRiwayat();
+
+    area.innerHTML = "";
+
+    if (!riwayat.length) {
+        pesan.textContent = "Belum ada catatan pemeriksaan.";
+        area.innerHTML = `
+            <div class="empty">
+                Belum ada riwayat pemeriksaan tersimpan.
+            </div>
+        `;
+        return;
+    }
+
+    pesan.textContent = "Total catatan: " + riwayat.length;
+
+    riwayat.slice().reverse().forEach(data => {
+        const item = document.createElement("article");
+        item.className = "history-item";
+
+        const judul = document.createElement("h4");
+        judul.textContent = data.peralatan || "Peralatan";
+
+        const petugas = document.createElement("p");
+        petugas.textContent = "Petugas: " + (data.petugas || "-");
+
+        const waktu = document.createElement("p");
+        waktu.textContent = "Waktu: " + (data.waktu || "-");
+
+        const status = document.createElement("p");
+        const badge = document.createElement("span");
+        badge.className = "history-status";
+
+        if (data.status === "Tidak beroperasi") {
+            badge.classList.add("status-alert");
+        } else if (data.status === "Dalam perbaikan") {
+            badge.classList.add("status-repair");
+        }
+
+        badge.textContent = "Status: " + (data.status || "-");
+        status.appendChild(badge);
+
+        const catatan = document.createElement("p");
+        catatan.textContent =
+            "Catatan: " + (data.catatan || "Tidak ada catatan");
+
+        item.append(judul, petugas, waktu, status, catatan);
+
+        if (Array.isArray(data.pemeriksaan)) {
+            const judulPoin = document.createElement("p");
+            judulPoin.textContent = "Detail pemeriksaan:";
+            judulPoin.style.fontWeight = "bold";
+            item.appendChild(judulPoin);
+
+            const daftar = document.createElement("ul");
+
+            data.pemeriksaan.forEach(poin => {
+                const baris = document.createElement("li");
+
+                baris.textContent =
+                    (poin.selesai ? "✓ " : "○ ") + poin.nama;
+
+                baris.style.margin = "7px 0";
+                daftar.appendChild(baris);
+            });
+
+            item.appendChild(daftar);
+        }
+
+        area.appendChild(item);
+    });
+}
+
+perbaruiDashboard();
+</script>
+
+</body>
+</html>
