@@ -12,33 +12,26 @@
     --dark2: #514542;
     --teal: #A8DCD8;
     --teal-dark: #477D78;
-    --bg: #F7F6F2;
+    --bg: #F7F7F5;
     --white: #FFFFFF;
-    --text: #332F2D;
-    --muted: #827B75;
-    --border: #E8E3DC;
-    --green: #27835B;
-    --red: #C44343;
-    --yellow: #A66B15;
+    --text: #302B29;
+    --muted: #77716F;
+    --border: #E7E2DF;
+    --red: #B83D3D;
 }
 
 * {
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
 body {
     margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
 }
 
-button, select, textarea {
+button, input, select, textarea {
     font: inherit;
 }
 
@@ -46,579 +39,646 @@ button {
     cursor: pointer;
 }
 
-.header {
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 245px;
+    flex-shrink: 0;
     background: var(--dark);
     color: white;
-    padding: 22px 5%;
-    border-bottom: 5px solid var(--teal);
+    padding: 24px 16px;
 }
 
-.header-inner {
-    max-width: 1200px;
-    margin: auto;
+.brand {
     display: flex;
     align-items: center;
-    gap: 0;
+    gap: 10px;
+    margin: 0 8px 30px;
 }
 
-.logo {
-    width: 100px;
-    height: 65px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.logo img {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+.brand img {
+    width: 48px;
+    height: 48px;
     object-fit: contain;
-    object-position: center;
+    border-radius: 6px;
+    background: white;
 }
 
-.brand h1 {
-    margin: 0 0 5px;
-    font-size: 25px;
-    letter-spacing: 2px;
+.brand-title {
+    font-size: 19px;
+    font-weight: bold;
+    letter-spacing: .5px;
 }
 
-.brand p {
-    margin: 0;
-    color: #D6D0CA;
+.brand-subtitle {
+    margin-top: 4px;
     font-size: 11px;
-    letter-spacing: 2px;
-}
-
-.header-tag {
-    margin-left: auto;
-    border: 1px solid #746B65;
-    padding: 9px 13px;
-    border-radius: 20px;
     color: var(--teal);
-    font-size: 11px;
-    white-space: nowrap;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 28px auto;
-    padding: 0 22px 40px;
+.nav-btn {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 9px;
+    padding: 13px 14px;
+    margin-bottom: 7px;
+    background: transparent;
+    color: #EEE9E6;
+    text-align: left;
 }
 
-.welcome {
+.nav-btn:hover,
+.nav-btn.active {
+    background: var(--dark2);
+    color: var(--teal);
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    padding: 28px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     margin-bottom: 25px;
 }
 
-.eyebrow {
-    color: var(--teal-dark);
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-h2 {
-    margin: 8px 0;
-    font-size: 26px;
-    letter-spacing: -.5px;
-}
-
-.subtitle {
-    color: var(--muted);
-    line-height: 1.7;
+.topbar h1 {
     margin: 0;
+    font-size: 25px;
 }
 
-.stats {
+.topbar p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.date-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 15px;
-    margin-bottom: 28px;
+    gap: 16px;
 }
 
-.stat {
-    background: white;
+.card {
+    background: var(--white);
     border: 1px solid var(--border);
-    border-radius: 13px;
-    padding: 19px;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    min-width: 0;
 }
 
 .stat-label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .stat-number {
-    font-size: 29px;
+    margin-top: 10px;
+    font-size: 30px;
     font-weight: bold;
-    margin: 13px 0 5px;
+    color: var(--dark);
 }
 
-.stat-note {
-    color: var(--muted);
-    font-size: 11px;
-}
-
-.section-heading {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 28px 0 15px;
-}
-
-.section-heading h3 {
-    margin: 0;
+.section-title {
     font-size: 18px;
-}
-
-.small-note {
-    font-size: 12px;
-    color: var(--muted);
-}
-
-.equipment-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 15px;
+    margin: 0 0 16px;
 }
 
 .equipment-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    transition: border-color .2s, transform .2s;
-}
-
-.equipment-card:hover {
-    border-color: var(--teal-dark);
-    transform: translateY(-2px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .equipment-icon {
-    width: 46px;
-    height: 46px;
-    background: #E4F3F1;
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
+    border-radius: 10px;
+    background: #E7F5F3;
     font-size: 23px;
-    margin-bottom: 15px;
 }
 
-.equipment-card h4 {
-    font-size: 17px;
-    margin: 0 0 7px;
+.equipment-card h3 {
+    font-size: 16px;
+    margin: 0;
 }
 
 .equipment-card p {
-    color: var(--muted);
+    margin: 0;
     font-size: 12px;
-    line-height: 1.6;
-    margin: 0 0 15px;
+    color: var(--muted);
 }
 
-.floor-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-}
-
-.btn {
+.primary-btn,
+.secondary-btn,
+.danger-btn {
     border: 0;
     border-radius: 8px;
-    padding: 11px 14px;
-    background: var(--dark);
+    padding: 11px 15px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.primary-btn {
+    background: var(--teal-dark);
     color: white;
-    font-weight: 600;
-    font-size: 12px;
-    transition: .2s;
 }
 
-.btn:hover {
-    background: var(--dark2);
+.primary-btn:hover {
+    background: #386762;
 }
 
-.btn-teal {
-    background: var(--teal);
+.secondary-btn {
+    background: #EEEAE7;
     color: var(--dark);
 }
 
-.btn-teal:hover {
-    background: #90CBC6;
+.danger-btn {
+    background: #FBEAEA;
+    color: var(--red);
 }
 
-.btn-light {
-    background: #F0EEEA;
-    color: var(--dark);
+.full-btn {
+    width: 100%;
 }
 
-.btn-light:hover {
-    background: #E5E1DB;
+.form-group {
+    margin-bottom: 18px;
 }
 
-.btn-danger {
-    background: #FBE9E7;
-    color: #A52D2D;
-}
-
-.panel {
-    margin-top: 25px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-}
-
-.panel h3 {
-    margin: 0 0 8px;
-    font-size: 20px;
-}
-
-.form-label {
+.form-group label {
     display: block;
-    font-weight: 700;
-    margin: 18px 0 8px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
 }
 
-select, textarea {
+.form-control {
     width: 100%;
     padding: 12px;
-    background: white;
-    border: 1px solid #D8D2CA;
+    border: 1px solid #D8D2CF;
     border-radius: 8px;
+    background: white;
     color: var(--text);
 }
 
-textarea {
-    resize: vertical;
+.form-control:focus {
+    outline: 2px solid var(--teal);
+    border-color: var(--teal-dark);
 }
 
 .check-item {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 14px;
-    margin: 8px 0;
-    border: 1px solid var(--border);
-    border-radius: 9px;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
     line-height: 1.5;
-    background: #FDFCF9;
+}
+
+.check-item:last-child {
+    border-bottom: 0;
 }
 
 .check-item input {
-    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
     accent-color: var(--teal-dark);
-    width: 16px;
-    height: 16px;
     flex-shrink: 0;
 }
 
 .status-options {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 9px;
+    gap: 10px;
 }
 
 .status-option {
     display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 12px;
+    align-items: center;
+    gap: 7px;
     border: 1px solid var(--border);
+    padding: 12px 10px;
     border-radius: 9px;
-    line-height: 1.5;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.status-option:has(input:checked) {
+    border-color: var(--teal-dark);
+    background: #EAF6F4;
 }
 
 .status-option input {
-    margin-top: 3px;
     accent-color: var(--teal-dark);
-    flex-shrink: 0;
 }
 
-.form-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-top: 20px;
-}
-
-.message {
-    margin-top: 12px;
-    color: var(--teal-dark);
-    font-weight: 600;
-    line-height: 1.6;
-}
-
-.history-item {
-    border: 1px solid var(--border);
-    border-radius: 11px;
-    padding: 17px;
-    margin-top: 12px;
-    overflow-wrap: anywhere;
-}
-
-.history-item h4 {
-    margin: 0 0 12px;
-    font-size: 16px;
-}
-
-.history-item p {
-    margin: 7px 0;
-    line-height: 1.5;
-}
-
-.history-status {
+.status-badge {
     display: inline-block;
-    background: #E4F3F1;
-    color: #315E5A;
-    padding: 5px 9px;
+    padding: 6px 9px;
     border-radius: 20px;
     font-size: 11px;
     font-weight: bold;
+    background: #E7F5F3;
+    color: #28655F;
 }
 
-.status-alert {
-    background: #FCE9E7;
-    color: #A52D2D;
+.status-badge.inactive {
+    background: #FCEDED;
+    color: #A43131;
 }
 
-.status-repair {
+.status-badge.repair {
     background: #FFF2D8;
-    color: #8B5A0A;
+    color: #8C5B00;
 }
 
-.empty {
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 580px;
+}
+
+th, td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #F8F6F5;
+    color: var(--dark);
+}
+
+.empty-state {
+    padding: 30px 12px;
+    text-align: center;
     color: var(--muted);
-    background: #FAF9F6;
+    font-size: 13px;
+}
+
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.notice {
+    background: #EAF6F4;
+    color: #315D58;
+    padding: 13px;
     border-radius: 9px;
-    padding: 20px;
-    text-align: center;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 16px;
 }
 
-.footer {
-    border-top: 1px solid var(--border);
-    padding: 22px;
-    text-align: center;
+.qr-header {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.qr-header img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+.qr-header strong {
+    font-size: 18px;
+}
+
+.qr-header p {
+    margin: 5px 0 0;
     color: var(--muted);
-    font-size: 11px;
-    letter-spacing: .5px;
+    font-size: 12px;
+}
+
+.qr-mode .sidebar {
+    display: none;
+}
+
+.qr-mode .main {
+    max-width: 850px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.qr-mode .topbar {
+    display: none;
+}
+
+.qr-mode .qr-header {
+    display: flex;
+}
+
+.qr-mode .page:not(#page-checklist) {
+    display: none !important;
+}
+
+.qr-mode #page-checklist {
+    display: block;
 }
 
 @media (max-width: 900px) {
-    .equipment-grid {
+    .grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .header-tag {
-        display: none;
+    .main {
+        padding: 20px;
+    }
+
+    .sidebar {
+        width: 205px;
     }
 }
 
-@media (max-width: 600px) {
-    .header {
-        padding: 18px 14px;
+@media (max-width: 620px) {
+    .app {
+        display: block;
     }
 
-    .header-inner {
-        gap: 12px;
+    .sidebar {
+        width: 100%;
+        padding: 15px;
     }
 
-    .logo {
-        width: 100px;
-        height: 52px;
+    .brand {
+        margin-bottom: 15px;
     }
 
-    .brand h1 {
-        font-size: 20px;
-        letter-spacing: 1px;
+    .nav-btn {
+        display: inline-block;
+        width: auto;
+        padding: 10px;
+        margin: 0 3px 4px 0;
+        font-size: 12px;
     }
 
-    .brand p {
-        font-size: 9px;
-        letter-spacing: 1px;
+    .main {
+        padding: 16px;
     }
 
-    .container {
-        padding: 0 14px 28px;
-        margin-top: 22px;
-    }
-
-    h2 {
-        font-size: 23px;
-    }
-
-    .stats {
-        grid-template-columns: 1fr;
-        gap: 9px;
-    }
-
-    .stat {
-        padding: 14px 17px;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        margin: 8px 0 4px;
-    }
-
-    .equipment-grid {
+    .grid {
         grid-template-columns: 1fr;
     }
 
-    .equipment-card {
-        padding: 17px;
+    .topbar h1 {
+        font-size: 21px;
     }
 
     .status-options {
         grid-template-columns: 1fr;
     }
 
-    .panel {
-        padding: 17px;
-    }
-
-    .section-heading {
-        align-items: flex-start;
-        flex-direction: column;
+    .qr-mode .main {
+        padding: 16px;
     }
 }
 </style>
 </head>
 
 <body>
+<div class="app" id="app">
 
-<header class="header">
-    <div class="header-inner">
-        <div class="logo">
-            <img src="./logo%20south78.jpg" alt="Logo SOUTH78">
-        </div>
-
+    <aside class="sidebar">
         <div class="brand">
-            <h1>SOUTH78</h1>
-            <p>BUILDING MANAGEMENT</p>
-        </div>
-
-        <div class="header-tag">OPERATIONAL CHECKLIST</div>
-    </div>
-</header>
-
-<main class="container">
-
-    <section class="welcome">
-        <div class="eyebrow">Building Operations System</div>
-        <h2>Operational Dashboard</h2>
-        <p class="subtitle">
-            Sistem pencatatan pemeriksaan peralatan operasional
-            Building Management SOUTH78.
-        </p>
-    </section>
-
-    <section class="stats">
-        <div class="stat">
-            <div class="stat-label">Total Pemeriksaan</div>
-            <div class="stat-number" id="totalPemeriksaan">0</div>
-            <div class="stat-note">Seluruh catatan di browser ini</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-label">Status Normal</div>
-            <div class="stat-number" id="totalNormal">0</div>
-            <div class="stat-note">Pemeriksaan berstatus normal</div>
-        </div>
-
-        <div class="stat">
-            <div class="stat-label">Perlu Perhatian</div>
-            <div class="stat-number" id="totalMasalah">0</div>
-            <div class="stat-note">Gangguan atau perbaikan</div>
-        </div>
-    </section>
-
-    <section>
-        <div class="section-heading">
-            <h3>Peralatan Operasional</h3>
-            <span class="small-note">Pilih peralatan untuk memulai checklist</span>
-        </div>
-
-        <div class="equipment-grid">
-
-            <article class="equipment-card">
-                <div class="equipment-icon">〰</div>
-                <h4>Kipas</h4>
-                <p>Pemeriksaan kipas berdasarkan area operasional.</p>
-                <div class="floor-buttons">
-                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas GF')">GF</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas MZ')">MZ</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas UG')">UG</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Kipas Lantai 1')">Lantai 1</button>
-                </div>
-            </article>
-
-            <article class="equipment-card">
-                <div class="equipment-icon">⇅</div>
-                <h4>Eskalator</h4>
-                <p>Pemeriksaan berdasarkan jalur penghubung lantai.</p>
-                <div class="floor-buttons">
-                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator GF–MZ')">GF–MZ</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator MZ–UG')">MZ–UG</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator UG–Lantai 1')">UG–Lantai 1</button>
-                    <button class="btn btn-light" onclick="pilihPeralatan('Eskalator Lantai 1–2')">Lantai 1–2</button>
-                </div>
-            </article>
-
-            <article class="equipment-card">
-                <div class="equipment-icon">≋</div>
-                <h4>Exhaust</h4>
-                <p>Pemeriksaan kondisi dan pengoperasian exhaust.</p>
-                <div class="floor-buttons">
-                    <button class="btn btn-light" onclick="pilihPeralatan('Exhaust B2')">Exhaust B2</button>
-                </div>
-            </article>
-
-        </div>
-    </section>
-
-    <section class="panel" id="panelChecklist">
-        <h3 id="judulChecklist">Checklist Pemeriksaan</h3>
-        <p class="subtitle" id="petunjukChecklist">
-            Pilih salah satu peralatan di atas untuk memulai pemeriksaan.
-        </p>
-        <div id="areaChecklist"></div>
-    </section>
-
-    <section class="panel">
-        <div class="section-heading" style="margin-top:0">
+            <img src="./logo%20south78.jpg"
+                 alt="Logo SOUTH78"
+                 onerror="this.style.display='none'">
             <div>
-                <h3>Riwayat Pemeriksaan</h3>
-                <p class="subtitle">Catatan pemeriksaan yang telah disimpan.</p>
-            </div>
-            <button class="btn btn-teal" onclick="tampilkanRiwayat()">
-                Muat Riwayat
-            </button>
-        </div>
-
-        <p class="small-note" id="pesanRiwayat"></p>
-
-        <div id="riwayatPemeriksaan">
-            <div class="empty">
-                Tekan "Muat Riwayat" untuk melihat catatan pemeriksaan.
+                <div class="brand-title">SOUTH78</div>
+                <div class="brand-subtitle">BUILDING MANAGEMENT</div>
             </div>
         </div>
-    </section>
 
-</main>
+        <button class="nav-btn active" data-page="dashboard"
+                onclick="bukaHalaman('dashboard')">Dashboard</button>
+        <button class="nav-btn" data-page="peralatan"
+                onclick="bukaHalaman('peralatan')">Checklist Peralatan</button>
+        <button class="nav-btn" data-page="riwayat"
+                onclick="bukaHalaman('riwayat')">Riwayat Pemeriksaan</button>
+        <button class="nav-btn" data-page="rekap"
+                onclick="bukaHalaman('rekap')">Rekap Laporan</button>
+        <button class="nav-btn" data-page="pengaturan"
+                onclick="bukaHalaman('pengaturan')">Pengaturan</button>
+    </aside>
 
-<footer class="footer">
-    SOUTH78 · BUILDING MANAGEMENT · OPERATIONAL CHECKLIST
-</footer>
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <h1 id="judulHalaman">Dashboard</h1>
+                <p>Sistem Checklist Operasional SOUTH78</p>
+            </div>
+            <div class="date-label" id="tanggalHeader"></div>
+        </div>
+
+        <div class="qr-header">
+            <img src="./logo%20south78.jpg" alt="Logo SOUTH78"
+                 onerror="this.style.display='none'">
+            <div>
+                <strong>SOUTH78</strong>
+                <p>Checklist Operasional Building Management</p>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <section class="page active" id="page-dashboard">
+            <div class="grid">
+                <div class="card">
+                    <div class="stat-label">Total Pemeriksaan</div>
+                    <div class="stat-number" id="totalPemeriksaan">0</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Status Aktif</div>
+                    <div class="stat-number" id="totalAktif">0</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Tidak Beroperasi</div>
+                    <div class="stat-number" id="totalTidakAktif">0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Akses Cepat</h2>
+                <p style="font-size:13px;color:var(--muted);line-height:1.7">
+                    Pilih checklist peralatan untuk melakukan pemeriksaan.
+                    Petugas dapat mengisi checklist, status keseluruhan,
+                    dan catatan pemeriksaan.
+                </p>
+                <button class="primary-btn"
+                        onclick="bukaHalaman('peralatan')">
+                    Buka Checklist Peralatan
+                </button>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">Pemeriksaan Terakhir</h2>
+                <div id="pemeriksaanTerakhir"></div>
+            </div>
+        </section>
+
+        <!-- DAFTAR PERALATAN -->
+        <section class="page" id="page-peralatan">
+            <div class="notice">
+                Pilih peralatan yang akan diperiksa. Jika membuka halaman
+                dari QR Code, checklist lokasi akan terbuka secara langsung.
+            </div>
+            <div class="grid" id="daftarPeralatan"></div>
+        </section>
+
+        <!-- FORM CHECKLIST -->
+        <section class="page" id="page-checklist">
+            <div class="card">
+                <h2 class="section-title" id="judulChecklist">
+                    Checklist Peralatan
+                </h2>
+                <div id="infoChecklist"
+                     style="font-size:13px;color:var(--muted);margin-bottom:18px">
+                </div>
+
+                <form id="formChecklist">
+                    <div class="form-group">
+                        <label for="namaPetugas">Nama Petugas</label>
+                        <select class="form-control" id="namaPetugas" required>
+                            <option value="">Pilih nama petugas</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Poin Pemeriksaan</label>
+                        <div id="areaChecklist"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status Keseluruhan Peralatan</label>
+                        <div class="status-options">
+                            <label class="status-option">
+                                <input type="radio" name="status"
+                                       value="Aktif" checked>
+                                Aktif
+                            </label>
+                            <label class="status-option">
+                                <input type="radio" name="status"
+                                       value="Tidak Beroperasi">
+                                Tidak Beroperasi
+                            </label>
+                            <label class="status-option">
+                                <input type="radio" name="status"
+                                       value="Dalam Perbaikan">
+                                Dalam Perbaikan
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="catatan">Catatan Pemeriksaan</label>
+                        <textarea class="form-control" id="catatan"
+                                  rows="3"
+                                  placeholder="Contoh: Tidak ada kendala."></textarea>
+                    </div>
+
+                    <div class="button-row">
+                        <button class="primary-btn" type="submit">
+                            Simpan Pemeriksaan
+                        </button>
+                        <button class="secondary-btn" type="button"
+                                onclick="kembaliDariChecklist()">
+                            Kembali
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- RIWAYAT -->
+        <section class="page" id="page-riwayat">
+            <div class="card">
+                <h2 class="section-title">Riwayat Pemeriksaan</h2>
+                <div class="table-wrap" id="tabelRiwayat"></div>
+            </div>
+        </section>
+
+        <!-- REKAP -->
+        <section class="page" id="page-rekap">
+            <div class="card">
+                <h2 class="section-title">Rekap Laporan</h2>
+                <p style="font-size:13px;color:var(--muted)">
+                    Unduh data pemeriksaan yang tersimpan di browser ini
+                    dalam format CSV untuk dibuka menggunakan Excel.
+                </p>
+                <div class="button-row">
+                    <button class="primary-btn" onclick="eksporCSV()">
+                        Ekspor Laporan CSV
+                    </button>
+                </div>
+                <div style="margin-top:22px" id="ringkasanRekap"></div>
+            </div>
+        </section>
+
+        <!-- PENGATURAN -->
+        <section class="page" id="page-pengaturan">
+            <div class="card">
+                <h2 class="section-title">Pengaturan</h2>
+                <p style="font-size:13px;line-height:1.7;color:var(--muted)">
+                    Riwayat saat ini tersimpan pada browser/perangkat yang
+                    digunakan. Menghapus riwayat di halaman ini hanya
+                    menghapus data lokal browser tersebut.
+                </p>
+                <button class="danger-btn" onclick="resetRiwayat()">
+                    Reset Semua Riwayat di Perangkat Ini
+                </button>
+            </div>
+        </section>
+
+    </main>
+</div>
 
 <script>
+/* =========================================
+   1. DAFTAR PETUGAS DAN PERALATAN
+   Ubah nama atau poin checklist di bagian ini.
+========================================= */
+
 const daftarPetugas = [
     "Trisman (SPV)",
     "Agus",
@@ -628,311 +688,677 @@ const daftarPetugas = [
     "Zidane"
 ];
 
-let peralatanAktif = "";
+const daftarAlat = [
+    {
+        id: "kipas-gf",
+        nama: "Kipas GF",
+        kategori: "Kipas",
+        lokasi: "Ground Floor",
+        ikon: "🌀",
+        poin: [
+            "Kipas dalam kondisi ON/menyala",
+            "Kipas beroperasi dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "kipas-mz",
+        nama: "Kipas MZ",
+        kategori: "Kipas",
+        lokasi: "Mezzanine",
+        ikon: "🌀",
+        poin: [
+            "Kipas dalam kondisi ON/menyala",
+            "Kipas beroperasi dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "kipas-ug",
+        nama: "Kipas UG",
+        kategori: "Kipas",
+        lokasi: "Upper Ground",
+        ikon: "🌀",
+        poin: [
+            "Kipas dalam kondisi ON/menyala",
+            "Kipas beroperasi dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "kipas-lantai-1",
+        nama: "Kipas Lantai 1",
+        kategori: "Kipas",
+        lokasi: "Lantai 1",
+        ikon: "🌀",
+        poin: [
+            "Kipas dalam kondisi ON/menyala",
+            "Kipas beroperasi dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "eskalator-gf-mz",
+        nama: "Eskalator GF–MZ",
+        kategori: "Eskalator",
+        lokasi: "Ground Floor – Mezzanine",
+        ikon: "↕️",
+        poin: [
+            "Eskalator dalam kondisi ON/aktif",
+            "Eskalator beroperasi sesuai arah operasional",
+            "Anak tangga dan handrail bergerak dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "eskalator-mz-ug",
+        nama: "Eskalator MZ–UG",
+        kategori: "Eskalator",
+        lokasi: "Mezzanine – Upper Ground",
+        ikon: "↕️",
+        poin: [
+            "Eskalator dalam kondisi ON/aktif",
+            "Eskalator beroperasi sesuai arah operasional",
+            "Anak tangga dan handrail bergerak dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "eskalator-ug-lantai-1",
+        nama: "Eskalator UG–Lantai 1",
+        kategori: "Eskalator",
+        lokasi: "Upper Ground – Lantai 1",
+        ikon: "↕️",
+        poin: [
+            "Eskalator dalam kondisi ON/aktif",
+            "Eskalator beroperasi sesuai arah operasional",
+            "Anak tangga dan handrail bergerak dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "eskalator-lantai-1-2",
+        nama: "Eskalator Lantai 1–2",
+        kategori: "Eskalator",
+        lokasi: "Lantai 1 – Lantai 2",
+        ikon: "↕️",
+        poin: [
+            "Eskalator dalam kondisi ON/aktif",
+            "Eskalator beroperasi sesuai arah operasional",
+            "Anak tangga dan handrail bergerak dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    },
+    {
+        id: "exhaust-b2",
+        nama: "Exhaust B2",
+        kategori: "Exhaust",
+        lokasi: "Basement 2",
+        ikon: "💨",
+        poin: [
+            "Exhaust dalam kondisi ON/menyala",
+            "Exhaust beroperasi dengan normal",
+            "Tidak terdapat suara atau getaran tidak normal saat beroperasi"
+        ]
+    }
+];
 
-// Daftar tujuan QR Code untuk setiap peralatan
-const daftarLinkPeralatan = {
-    "kipas-gf": "Kipas GF",
-    "kipas-mz": "Kipas MZ",
-    "kipas-ug": "Kipas UG",
-    "kipas-lantai-1": "Kipas Lantai 1",
-    "eskalator-gf-mz": "Eskalator GF–MZ",
-    "eskalator-mz-ug": "Eskalator MZ–UG",
-    "eskalator-ug-lantai-1": "Eskalator UG–Lantai 1",
-    "eskalator-lantai-1-2": "Eskalator Lantai 1–2",
-    "exhaust-b2": "Exhaust B2"
-};
+
+/* =========================================
+   2. DATA DAN MODE QR
+========================================= */
+
+const KUNCI_RIWAYAT = "riwayatPemeriksaan";
+
+let peralatanAktif = null;
+
+const parameterAlat = new URLSearchParams(
+    window.location.search
+).get("alat");
+
+const modeQR = Boolean(
+    parameterAlat &&
+    daftarAlat.some(alat => alat.id === parameterAlat)
+);
+
+if (modeQR) {
+    document.body.classList.add("qr-mode");
+}
 
 function bacaRiwayat() {
     try {
         const data = JSON.parse(
-            localStorage.getItem("riwayatPemeriksaan") || "[]"
+            localStorage.getItem(KUNCI_RIWAYAT) || "[]"
         );
-        return Array.isArray(data) ? data : [];
+
+        if (!Array.isArray(data)) return [];
+
+        // Menyesuaikan data lama yang masih memakai status "Normal".
+        return data.map(item => ({
+            ...item,
+            status: item.status === "Normal" ? "Aktif" : item.status
+        }));
     } catch (error) {
         return [];
     }
 }
 
-function perbaruiDashboard() {
-    const riwayat = bacaRiwayat();
+let riwayatPemeriksaan = bacaRiwayat();
 
-    document.getElementById("totalPemeriksaan").textContent =
-        riwayat.length;
 
-    document.getElementById("totalNormal").textContent =
-        riwayat.filter(item => item.status === "Normal").length;
+/* =========================================
+   3. NAVIGASI HALAMAN
+========================================= */
 
-    document.getElementById("totalMasalah").textContent =
-        riwayat.filter(item => item.status !== "Normal").length;
-}
+const namaHalaman = {
+    dashboard: "Dashboard",
+    peralatan: "Checklist Peralatan",
+    checklist: "Checklist Pemeriksaan",
+    riwayat: "Riwayat Pemeriksaan",
+    rekap: "Rekap Laporan",
+    pengaturan: "Pengaturan"
+};
 
-function pilihPeralatan(nama) {
-    peralatanAktif = nama;
+function bukaHalaman(nama) {
+    if (modeQR) return;
 
-    document.getElementById("judulChecklist").textContent =
-        "Checklist " + nama;
-
-    document.getElementById("petunjukChecklist").textContent =
-        "Pilih petugas, periksa setiap poin, lalu simpan hasil pemeriksaan.";
-
-    const area = document.getElementById("areaChecklist");
-    let pemeriksaan = [];
-
-    if (nama.startsWith("Kipas")) {
-        pemeriksaan = [
-            "Kondisi fisik kipas baik",
-            "Kipas menyala sesuai jadwal operasional",
-            "Putaran kipas normal",
-            "Tidak ada suara abnormal",
-            "Area sekitar kipas aman"
-        ];
-    } else if (nama.startsWith("Eskalator")) {
-        pemeriksaan = [
-            "Kondisi visual eskalator baik",
-            "Eskalator beroperasi sesuai jadwal",
-            "Tidak ada suara abnormal",
-            "Handrail bergerak normal",
-            "Anak tangga bergerak normal",
-            "Area masuk dan keluar aman"
-        ];
-    } else if (nama.startsWith("Exhaust")) {
-        pemeriksaan = [
-            "Kondisi fisik exhaust baik",
-            "Exhaust beroperasi sesuai jadwal",
-            "Tidak ada suara atau getaran abnormal",
-            "Area sekitar exhaust aman"
-        ];
-    }
-
-    let pilihanNama =
-        '<option value="">-- Pilih nama petugas --</option>';
-
-    daftarPetugas.forEach(petugas => {
-        const option = document.createElement("option");
-        option.value = petugas;
-        option.textContent = petugas;
-        pilihanNama += option.outerHTML;
+    document.querySelectorAll(".page").forEach(halaman => {
+        halaman.classList.remove("active");
     });
 
-    let daftarPoin = "";
+    const halamanTujuan = document.getElementById("page-" + nama);
 
-    pemeriksaan.forEach((item, index) => {
-        daftarPoin += `
+    if (halamanTujuan) {
+        halamanTujuan.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(tombol => {
+        tombol.classList.toggle(
+            "active",
+            tombol.dataset.page === nama
+        );
+    });
+
+    document.getElementById("judulHalaman").textContent =
+        namaHalaman[nama] || "SOUTH78";
+
+    if (nama === "dashboard") perbaruiDashboard();
+    if (nama === "peralatan") tampilkanDaftarPeralatan();
+    if (nama === "riwayat") tampilkanRiwayat();
+    if (nama === "rekap") tampilkanRekap();
+}
+
+
+/* =========================================
+   4. DAFTAR PERALATAN
+========================================= */
+
+function tampilkanDaftarPeralatan() {
+    const area = document.getElementById("daftarPeralatan");
+
+    area.innerHTML = daftarAlat.map(alat => `
+        <div class="card equipment-card">
+            <div class="equipment-icon">${alat.ikon}</div>
+            <h3>${alat.nama}</h3>
+            <p>${alat.lokasi}</p>
+            <button class="primary-btn full-btn"
+                    onclick="pilihPeralatan('${alat.id}')">
+                Buka Checklist
+            </button>
+        </div>
+    `).join("");
+}
+
+
+/* =========================================
+   5. MEMBUKA CHECKLIST PERALATAN
+========================================= */
+
+function pilihPeralatan(id) {
+    const alat = daftarAlat.find(item => item.id === id);
+
+    if (!alat) {
+        alert("Peralatan tidak ditemukan.");
+        return;
+    }
+
+    if (modeQR && id !== parameterAlat) {
+        return;
+    }
+
+    peralatanAktif = alat;
+
+    document.getElementById("judulChecklist").textContent =
+        "Checklist " + alat.nama;
+
+    document.getElementById("infoChecklist").textContent =
+        "Lokasi: " + alat.lokasi;
+
+    document.getElementById("areaChecklist").innerHTML =
+        alat.poin.map((poin, index) => `
             <label class="check-item">
-                <input type="checkbox" id="cek${index}">
-                <span>${item}</span>
+                <input type="checkbox"
+                       name="pemeriksaan"
+                       value="${index}">
+                <span>${index + 1}. ${poin}</span>
             </label>
-        `;
-    });
+        `).join("");
 
-    area.innerHTML = `
-        <label class="form-label" for="namaPetugas">Nama Petugas</label>
-        <select id="namaPetugas">${pilihanNama}</select>
+    document.getElementById("formChecklist").reset();
 
-        <label class="form-label">Poin Pemeriksaan</label>
-        ${daftarPoin}
+    // Pastikan status awal selalu Aktif.
+    document.querySelector(
+        'input[name="status"][value="Aktif"]'
+    ).checked = true;
 
-        <label class="form-label">Status Keseluruhan</label>
-        <div class="status-options">
-            <label class="status-option">
-                <input type="radio" name="status" value="Normal" checked>
-                <span>Normal</span>
-            </label>
-
-            <label class="status-option">
-                <input type="radio" name="status" value="Tidak beroperasi">
-                <span>Tidak menyala / tidak beroperasi</span>
-            </label>
-
-            <label class="status-option">
-                <input type="radio" name="status" value="Dalam perbaikan">
-                <span>Dalam perbaikan / sengaja dimatikan</span>
-            </label>
-        </div>
-
-        <label class="form-label" for="catatan">Catatan Kendala</label>
-        <textarea id="catatan" rows="4"
-            placeholder="Tuliskan kendala jika ada..."></textarea>
-
-        <div class="form-actions">
-            <button class="btn btn-teal" onclick="simpanPemeriksaan()">
-                Simpan Pemeriksaan
-            </button>
-            <button class="btn btn-light" onclick="batalPemeriksaan()">
-                Batal
-            </button>
-        </div>
-
-        <p class="message" id="hasilSimpan" role="status"></p>
-    `;
-
-    document.getElementById("panelChecklist").scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-
-function batalPemeriksaan() {
-    peralatanAktif = "";
-
-    document.getElementById("judulChecklist").textContent =
-        "Checklist Pemeriksaan";
-
-    document.getElementById("petunjukChecklist").textContent =
-        "Pilih salah satu peralatan di atas untuk memulai pemeriksaan.";
-
-    document.getElementById("areaChecklist").innerHTML = "";
-}
-
-function simpanPemeriksaan() {
-    if (!peralatanAktif) {
-        alert("Silakan pilih peralatan terlebih dahulu.");
-        return;
-    }
-
-    const namaPetugas = document.getElementById("namaPetugas").value;
-
-    if (!namaPetugas) {
-        alert("Silakan pilih nama petugas terlebih dahulu.");
-        return;
-    }
-
-    const statusDipilih = document.querySelector(
-        '#areaChecklist input[name="status"]:checked'
-    );
-
-    const daftarCentang = document.querySelectorAll(
-        '#areaChecklist input[type="checkbox"]'
-    );
-
-    const hasilPoin = [];
-
-    daftarCentang.forEach(checkbox => {
-        hasilPoin.push({
-            nama: checkbox.nextElementSibling.textContent.trim(),
-            selesai: checkbox.checked
+    if (modeQR) {
+        document.querySelectorAll(".page").forEach(halaman => {
+            halaman.classList.remove("active");
         });
+
+        document.getElementById("page-checklist")
+            .classList.add("active");
+
+        return;
+    }
+
+    document.querySelectorAll(".page").forEach(halaman => {
+        halaman.classList.remove("active");
     });
 
-    const dataBaru = {
-        id: Date.now(),
-        peralatan: "Checklist " + peralatanAktif,
-        petugas: namaPetugas,
-        status: statusDipilih.value,
-        catatan: document.getElementById("catatan").value.trim()
-            || "Tidak ada catatan",
-        waktu: new Date().toLocaleString("id-ID"),
-        pemeriksaan: hasilPoin
-    };
+    document.getElementById("page-checklist")
+        .classList.add("active");
 
-    const riwayat = bacaRiwayat();
-    riwayat.push(dataBaru);
+    document.querySelectorAll(".nav-btn").forEach(tombol => {
+        tombol.classList.remove("active");
+    });
 
-    try {
-        localStorage.setItem(
-            "riwayatPemeriksaan",
-            JSON.stringify(riwayat)
+    document.getElementById("judulHalaman").textContent =
+        "Checklist Pemeriksaan";
+}
+
+function kembaliDariChecklist() {
+    if (modeQR) return;
+    bukaHalaman("peralatan");
+}
+
+
+/* =========================================
+   6. MENYIMPAN HASIL PEMERIKSAAN
+========================================= */
+
+document.getElementById("formChecklist")
+    .addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        if (!peralatanAktif) {
+            alert("Silakan pilih peralatan terlebih dahulu.");
+            return;
+        }
+
+        const petugas =
+            document.getElementById("namaPetugas").value;
+
+        const status = document.querySelector(
+            'input[name="status"]:checked'
+        )?.value || "Aktif";
+
+        const catatan =
+            document.getElementById("catatan").value.trim();
+
+        const pilihan = Array.from(
+            document.querySelectorAll(
+                'input[name="pemeriksaan"]:checked'
+            )
+        ).map(input => Number(input.value));
+
+        const pemeriksaan = peralatanAktif.poin.map(
+            (poin, index) => ({
+                poin: poin,
+                selesai: pilihan.includes(index)
+            })
         );
 
-        document.getElementById("hasilSimpan").textContent =
-            "Pemeriksaan berhasil disimpan.";
+        const hasil = {
+            id: Date.now().toString() + "-" +
+                Math.random().toString(36).slice(2, 8),
+            peralatan: peralatanAktif.nama,
+            alatId: peralatanAktif.id,
+            kategori: peralatanAktif.kategori,
+            lokasi: peralatanAktif.lokasi,
+            petugas: petugas,
+            status: status,
+            catatan: catatan || "Tidak ada catatan",
+            waktu: new Date().toISOString(),
+            pemeriksaan: pemeriksaan
+        };
+
+        riwayatPemeriksaan.unshift(hasil);
+
+        try {
+            localStorage.setItem(
+                KUNCI_RIWAYAT,
+                JSON.stringify(riwayatPemeriksaan)
+            );
+        } catch (error) {
+            riwayatPemeriksaan.shift();
+            alert("Data tidak berhasil disimpan di browser ini.");
+            return;
+        }
+
+        alert("Pemeriksaan berhasil disimpan.");
 
         perbaruiDashboard();
-        tampilkanRiwayat();
-    } catch (error) {
-        document.getElementById("hasilSimpan").textContent =
-            "Gagal menyimpan. Penyimpanan browser mungkin penuh.";
-    }
-}
 
-function tampilkanRiwayat() {
-    const area = document.getElementById("riwayatPemeriksaan");
-    const pesan = document.getElementById("pesanRiwayat");
-    const riwayat = bacaRiwayat();
-
-    area.innerHTML = "";
-
-    if (!riwayat.length) {
-        pesan.textContent = "Belum ada catatan pemeriksaan.";
-        area.innerHTML = `
-            <div class="empty">
-                Belum ada riwayat pemeriksaan tersimpan.
-            </div>
-        `;
-        return;
-    }
-
-    pesan.textContent = "Total catatan: " + riwayat.length;
-
-    riwayat.slice().reverse().forEach(data => {
-        const item = document.createElement("article");
-        item.className = "history-item";
-
-        const judul = document.createElement("h4");
-        judul.textContent = data.peralatan || "Peralatan";
-
-        const petugas = document.createElement("p");
-        petugas.textContent = "Petugas: " + (data.petugas || "-");
-
-        const waktu = document.createElement("p");
-        waktu.textContent = "Waktu: " + (data.waktu || "-");
-
-        const status = document.createElement("p");
-        const badge = document.createElement("span");
-        badge.className = "history-status";
-
-        if (data.status === "Tidak beroperasi") {
-            badge.classList.add("status-alert");
-        } else if (data.status === "Dalam perbaikan") {
-            badge.classList.add("status-repair");
+        if (modeQR) {
+            pilihPeralatan(parameterAlat);
+        } else {
+            bukaHalaman("riwayat");
         }
+    });
 
-        badge.textContent = "Status: " + (data.status || "-");
-        status.appendChild(badge);
 
-        const catatan = document.createElement("p");
-        catatan.textContent =
-            "Catatan: " + (data.catatan || "Tidak ada catatan");
+/* =========================================
+   7. STATUS DAN FORMAT TANGGAL
+========================================= */
 
-        item.append(judul, petugas, waktu, status, catatan);
+function formatTanggal(waktu) {
+    const tanggal = new Date(waktu);
 
-        if (Array.isArray(data.pemeriksaan)) {
-            const judulPoin = document.createElement("p");
-            judulPoin.textContent = "Detail pemeriksaan:";
-            judulPoin.style.fontWeight = "bold";
-            item.appendChild(judulPoin);
+    if (isNaN(tanggal.getTime())) return "-";
 
-            const daftar = document.createElement("ul");
-
-            data.pemeriksaan.forEach(poin => {
-                const baris = document.createElement("li");
-                baris.textContent =
-                    (poin.selesai ? "✓ " : "○ ") + poin.nama;
-                baris.style.margin = "7px 0";
-                daftar.appendChild(baris);
-            });
-
-            item.appendChild(daftar);
-        }
-
-        area.appendChild(item);
+    return tanggal.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
     });
 }
 
-// Jalankan saat halaman dibuka
-perbaruiDashboard();
-tampilkanRiwayat();
-
-// Jika URL berisi parameter QR, langsung buka checklist yang sesuai
-const parameterAlat = new URLSearchParams(
-    window.location.search
-).get("alat");
-
-if (parameterAlat && daftarLinkPeralatan[parameterAlat]) {
-    pilihPeralatan(daftarLinkPeralatan[parameterAlat]);
+function kelasStatus(status) {
+    if (status === "Tidak Beroperasi") return "inactive";
+    if (status === "Dalam Perbaikan") return "repair";
+    return "";
 }
-</script>
 
+function badgeStatus(status) {
+    return `<span class="status-badge ${kelasStatus(status)}">
+        ${status}
+    </span>`;
+}
+
+
+/* =========================================
+   8. DASHBOARD
+========================================= */
+
+function perbaruiDashboard() {
+    document.getElementById("totalPemeriksaan").textContent =
+        riwayatPemeriksaan.length;
+
+    document.getElementById("totalAktif").textContent =
+        riwayatPemeriksaan.filter(
+            item => item.status === "Aktif"
+        ).length;
+
+    document.getElementById("totalTidakAktif").textContent =
+        riwayatPemeriksaan.filter(
+            item => item.status === "Tidak Beroperasi"
+        ).length;
+
+    const area = document.getElementById("pemeriksaanTerakhir");
+    const terbaru = riwayatPemeriksaan.slice(0, 5);
+
+    if (terbaru.length === 0) {
+        area.innerHTML =
+            '<div class="empty-state">Belum ada pemeriksaan tersimpan.</div>';
+        return;
+    }
+
+    area.innerHTML = `
+        <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Waktu</th>
+                    <th>Peralatan</th>
+                    <th>Petugas</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${terbaru.map(item => `
+                    <tr>
+                        <td>${formatTanggal(item.waktu)}</td>
+                        <td>${item.peralatan}</td>
+                        <td>${item.petugas}</td>
+                        <td>${badgeStatus(item.status)}</td>
+                    </tr>
+                `).join("")}
+            </tbody>
+        </table>
+        </div>
+    `;
+}
+
+
+/* =========================================
+   9. RIWAYAT PEMERIKSAAN
+========================================= */
+
+function tampilkanRiwayat() {
+    const area = document.getElementById("tabelRiwayat");
+
+    if (riwayatPemeriksaan.length === 0) {
+        area.innerHTML =
+            '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
+        return;
+    }
+
+    area.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Waktu</th>
+                    <th>Peralatan</th>
+                    <th>Petugas</th>
+                    <th>Status</th>
+                    <th>Checklist</th>
+                    <th>Catatan</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${riwayatPemeriksaan.map(item => {
+                    const total = (item.pemeriksaan || []).length;
+                    const selesai = (item.pemeriksaan || [])
+                        .filter(p => p.selesai).length;
+
+                    return `
+                        <tr>
+                            <td>${formatTanggal(item.waktu)}</td>
+                            <td>${item.peralatan}</td>
+                            <td>${item.petugas}</td>
+                            <td>${badgeStatus(item.status)}</td>
+                            <td>${selesai}/${total} poin</td>
+                            <td>${escapeHTML(item.catatan || "-")}</td>
+                        </tr>
+                    `;
+                }).join("")}
+            </tbody>
+        </table>
+    `;
+}
+
+
+/* =========================================
+   10. REKAP DAN EKSPOR CSV
+========================================= */
+
+function tampilkanRekap() {
+    const area = document.getElementById("ringkasanRekap");
+
+    const jumlahAktif = riwayatPemeriksaan.filter(
+        item => item.status === "Aktif"
+    ).length;
+
+    const jumlahTidakBeroperasi = riwayatPemeriksaan.filter(
+        item => item.status === "Tidak Beroperasi"
+    ).length;
+
+    const jumlahPerbaikan = riwayatPemeriksaan.filter(
+        item => item.status === "Dalam Perbaikan"
+    ).length;
+
+    area.innerHTML = `
+        <h3 style="font-size:15px">Ringkasan Data</h3>
+        <p style="font-size:13px">Total pemeriksaan:
+            <strong>${riwayatPemeriksaan.length}</strong></p>
+        <p style="font-size:13px">Aktif:
+            <strong>${jumlahAktif}</strong></p>
+        <p style="font-size:13px">Tidak Beroperasi:
+            <strong>${jumlahTidakBeroperasi}</strong></p>
+        <p style="font-size:13px">Dalam Perbaikan:
+            <strong>${jumlahPerbaikan}</strong></p>
+    `;
+}
+
+function eksporCSV() {
+    if (riwayatPemeriksaan.length === 0) {
+        alert("Belum ada data untuk diekspor.");
+        return;
+    }
+
+    const kolom = [
+        "Waktu",
+        "Peralatan",
+        "Lokasi",
+        "Petugas",
+        "Status",
+        "Checklist Selesai",
+        "Total Poin",
+        "Catatan"
+    ];
+
+    const baris = riwayatPemeriksaan.map(item => {
+        const daftarPoin = item.pemeriksaan || [];
+        const selesai = daftarPoin.filter(p => p.selesai).length;
+
+        return [
+            formatTanggal(item.waktu),
+            item.peralatan,
+            item.lokasi || "",
+            item.petugas,
+            item.status,
+            selesai,
+            daftarPoin.length,
+            item.catatan || ""
+        ];
+    });
+
+    function csvCell(nilai) {
+        return '"' + String(nilai ?? "").replace(/"/g, '""') + '"';
+    }
+
+    const isiCSV = [
+        kolom.map(csvCell).join(","),
+        ...baris.map(barisData => barisData.map(csvCell).join(","))
+    ].join("\r\n");
+
+    const blob = new Blob(
+        ["\uFEFF" + isiCSV],
+        { type: "text/csv;charset=utf-8;" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Rekap_Pemeriksaan_SOUTH78.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+}
+
+
+/* =========================================
+   11. RESET RIWAYAT
+========================================= */
+
+function resetRiwayat() {
+    if (modeQR) return;
+
+    const yakin = confirm(
+        "Apakah kamu yakin ingin menghapus SEMUA riwayat " +
+        "pemeriksaan dari browser/perangkat ini? " +
+        "Data yang dihapus tidak dapat dipulihkan."
+    );
+
+    if (!yakin) return;
+
+    riwayatPemeriksaan = [];
+    localStorage.removeItem(KUNCI_RIWAYAT);
+
+    perbaruiDashboard();
+    tampilkanRiwayat();
+    tampilkanRekap();
+
+    alert("Riwayat di browser ini sudah direset.");
+}
+
+
+/* =========================================
+   12. KEAMANAN TAMPILAN TEKS
+========================================= */
+
+function escapeHTML(teks) {
+    return String(teks ?? "").replace(/[&<>"']/g, karakter => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[karakter]);
+}
+
+
+/* =========================================
+   13. MENYIAPKAN APLIKASI
+========================================= */
+
+function isiDaftarPetugas() {
+    const select = document.getElementById("namaPetugas");
+
+    select.innerHTML =
+        '<option value="">Pilih nama petugas</option>' +
+        daftarPetugas.map(nama =>
+            `<option value="${escapeHTML(nama)}">${escapeHTML(nama)}</option>`
+        ).join("");
+}
+
+function mulaiAplikasi() {
+    document.getElementById("tanggalHeader").textContent =
+        new Date().toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+
+    isiDaftarPetugas();
+    tampilkanDaftarPeralatan();
+    perbaruiDashboard();
+    tampilkanRiwayat();
+    tampilkanRekap();
+
+    if (modeQR) {
+        pilihPeralatan(parameterAlat);
+    }
+}
+
+mulaiAplikasi();
+</script>
 </body>
 </html>
