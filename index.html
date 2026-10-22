@@ -410,12 +410,72 @@ th {
     display: flex;
 }
 
-.qr-mode .page:not(#page-checklist) {
+.qr-mode .page:not(#page-checklist):not(#page-sukses):not(#page-riwayat) {
     display: none !important;
 }
 
-.qr-mode #page-checklist {
-    display: block;
+.qr-mode #page-checklist:not(.active),
+.qr-mode #page-sukses:not(.active),
+.qr-mode #page-riwayat:not(.active) {
+    display: none !important;
+}
+
+.success-mark {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    margin: 4px auto 18px;
+    border-radius: 50%;
+    background: #E7F5F3;
+    color: #28655F;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.success-heading {
+    text-align: center;
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.success-description {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 22px;
+}
+
+.detail-list {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 18px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+}
+
+.detail-row:last-child {
+    border-bottom: 0;
+}
+
+.detail-label {
+    color: var(--muted);
+    flex-shrink: 0;
+}
+
+.detail-value {
+    text-align: right;
+    font-weight: bold;
+    overflow-wrap: anywhere;
 }
 
 @media (max-width: 900px) {
@@ -627,6 +687,26 @@ th {
                         </button>
                     </div>
                 </form>
+            </div>
+        </section>
+
+        <!-- KONFIRMASI / PEMERIKSAAN TERAKHIR -->
+        <section class="page" id="page-sukses">
+            <div class="card">
+                <div class="success-mark" id="ikonKonfirmasi">✓</div>
+                <h2 class="success-heading" id="judulKonfirmasi">Pemeriksaan Berhasil Disimpan</h2>
+                <p class="success-description" id="deskripsiKonfirmasi">
+                    Data pemeriksaan sudah tersimpan di perangkat ini.
+                </p>
+                <div id="detailKonfirmasi"></div>
+                <div class="button-row">
+                    <button class="primary-btn" type="button" onclick="mulaiPemeriksaanBaru()">
+                        Kembali ke Checklist
+                    </button>
+                    <button class="secondary-btn" type="button" onclick="lihatRiwayatQR()">
+                        Lihat Riwayat
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -854,6 +934,7 @@ const namaHalaman = {
     dashboard: "Dashboard",
     peralatan: "Checklist Peralatan",
     checklist: "Checklist Pemeriksaan",
+    sukses: "Konfirmasi Pemeriksaan",
     riwayat: "Riwayat Pemeriksaan",
     rekap: "Rekap Laporan",
     pengaturan: "Pengaturan"
@@ -952,13 +1033,12 @@ function pilihPeralatan(id) {
     ).checked = true;
 
     if (modeQR) {
-        document.querySelectorAll(".page").forEach(halaman => {
-            halaman.classList.remove("active");
-        });
-
-        document.getElementById("page-checklist")
-            .classList.add("active");
-
+        const ultimo = obtenerUltimoRegistro(alat.id);
+        if (ultimo) {
+            tampilkanKonfirmasi(ultimo, true);
+        } else {
+            tampilkanHalamanQR("checklist");
+        }
         return;
     }
 
@@ -982,6 +1062,53 @@ function kembaliDariChecklist() {
     bukaHalaman("peralatan");
 }
 
+function mendapatkanWaktuTerbaru(itemA, itemB) {
+    return new Date(itemB.waktu).getTime() - new Date(itemA.waktu).getTime();
+}
+
+function obtenerUltimoRegistro(alatId) {
+    return riwayatPemeriksaan
+        .filter(item => item.alatId === alatId)
+        .sort((a, b) => mendapatkanWaktuTerbaru(a, b))[0] || null;
+}
+
+function tampilkanHalamanQR(nama) {
+    document.querySelectorAll(".page").forEach(halaman => {
+        halaman.classList.remove("active");
+    });
+    const tujuan = document.getElementById("page-" + nama);
+    if (tujuan) tujuan.classList.add("active");
+}
+
+function mulaiPemeriksaanBaru() {
+    if (modeQR && parameterAlat) {
+        // Reset formulir untuk pemeriksaan baru.
+        const form = document.getElementById("formChecklist");
+        form.reset();
+        document.querySelectorAll('input[name="pemeriksaan"]').forEach(input => input.checked = false);
+        document.querySelector('input[name="status"][value="Aktif"]').checked = true;
+        tampilkanHalamanQR("checklist");
+        return;
+    }
+    if (peralatanAktif) pilihPeralatan(peralatanAktif.id);
+}
+
+function lihatRiwayatQR() {
+    if (modeQR) {
+        tampilkanRiwayat();
+        tampilkanHalamanQR("riwayat");
+        return;
+    }
+    bukaHalaman("riwayat");
+}
+
+function kembaliKeChecklistQR() {
+    if (modeQR && parameterAlat) {
+        mulaiPemeriksaanBaru();
+    } else {
+        bukaHalaman("checklist");
+    }
+}
 
 /* =========================================
    6. MENYIMPAN HASIL PEMERIKSAAN
@@ -1046,13 +1173,14 @@ document.getElementById("formChecklist")
             return;
         }
 
-        alert("Pemeriksaan berhasil disimpan.");
-
         perbaruiDashboard();
 
         if (modeQR) {
-            pilihPeralatan(parameterAlat);
+            tampilkanRiwayat();
+            tampilkanRekap();
+            tampilkanKonfirmasi(hasil, false);
         } else {
+            alert("Pemeriksaan berhasil disimpan.");
             bukaHalaman("riwayat");
         }
     });
@@ -1086,6 +1214,29 @@ function badgeStatus(status) {
     return `<span class="status-badge ${kelasStatus(status)}">
         ${status}
     </span>`;
+}
+
+function tampilkanKonfirmasi(hasil, isLastRecord) {
+    document.getElementById("ikonKonfirmasi").textContent = isLastRecord ? "✓" : "✓";
+    document.getElementById("judulKonfirmasi").textContent = isLastRecord
+        ? "Pemeriksaan Terakhir Tersimpan"
+        : "Pemeriksaan Berhasil Disimpan";
+    document.getElementById("deskripsiKonfirmasi").textContent = isLastRecord
+        ? "Berikut status pemeriksaan terakhir yang tersimpan untuk peralatan pada QR ini."
+        : "Data pemeriksaan kamu berhasil disimpan di browser/perangkat ini.";
+
+    const detail = document.getElementById("detailKonfirmasi");
+    detail.innerHTML = `
+        <div class="detail-list">
+            <div class="detail-row"><span class="detail-label">Petugas</span><span class="detail-value">${escapeHTML(hasil.petugas || "-")}</span></div>
+            <div class="detail-row"><span class="detail-label">Peralatan</span><span class="detail-value">${escapeHTML(hasil.peralatan || "-")}</span></div>
+            <div class="detail-row"><span class="detail-label">Lokasi</span><span class="detail-value">${escapeHTML(hasil.lokasi || "-")}</span></div>
+            <div class="detail-row"><span class="detail-label">Tanggal & Jam</span><span class="detail-value">${escapeHTML(formatTanggal(hasil.waktu))}</span></div>
+            <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${badgeStatus(hasil.status || "-")}</span></div>
+            <div class="detail-row"><span class="detail-label">Checklist</span><span class="detail-value">${(hasil.pemeriksaan || []).filter(p => p.selesai).length}/${(hasil.pemeriksaan || []).length} poin selesai</span></div>
+            <div class="detail-row"><span class="detail-label">Catatan</span><span class="detail-value">${escapeHTML(hasil.catatan || "-")}</span></div>
+        </div>`;
+    tampilkanHalamanQR("sukses");
 }
 
 
@@ -1149,14 +1300,21 @@ function perbaruiDashboard() {
 
 function tampilkanRiwayat() {
     const area = document.getElementById("tabelRiwayat");
+    const dataRiwayat = modeQR
+        ? riwayatPemeriksaan.filter(item => item.alatId === parameterAlat)
+        : riwayatPemeriksaan;
 
-    if (riwayatPemeriksaan.length === 0) {
-        area.innerHTML =
-            '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
+    let tombolKembali = "";
+    if (modeQR) {
+        tombolKembali = '<div class="button-row" style="margin-top:0;margin-bottom:16px"><button class="secondary-btn" type="button" onclick="kembaliKeChecklistQR()">Kembali ke Checklist</button></div>';
+    }
+
+    if (dataRiwayat.length === 0) {
+        area.innerHTML = tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
         return;
     }
 
-    area.innerHTML = `
+    const tabel = `
         <table>
             <thead>
                 <tr>
@@ -1169,7 +1327,7 @@ function tampilkanRiwayat() {
                 </tr>
             </thead>
             <tbody>
-                ${riwayatPemeriksaan.map(item => {
+                ${dataRiwayat.map(item => {
                     const total = (item.pemeriksaan || []).length;
                     const selesai = (item.pemeriksaan || [])
                         .filter(p => p.selesai).length;
@@ -1177,9 +1335,9 @@ function tampilkanRiwayat() {
                     return `
                         <tr>
                             <td>${formatTanggal(item.waktu)}</td>
-                            <td>${item.peralatan}</td>
-                            <td>${item.petugas}</td>
-                            <td>${badgeStatus(item.status)}</td>
+                            <td>${escapeHTML(item.peralatan || "-")}</td>
+                            <td>${escapeHTML(item.petugas || "-")}</td>
+                            <td>${badgeStatus(item.status || "Aktif")}</td>
                             <td>${selesai}/${total} poin</td>
                             <td>${escapeHTML(item.catatan || "-")}</td>
                         </tr>
@@ -1188,8 +1346,8 @@ function tampilkanRiwayat() {
             </tbody>
         </table>
     `;
+    area.innerHTML = tombolKembali + tabel;
 }
-
 
 /* =========================================
    10. REKAP DAN EKSPOR CSV
