@@ -365,11 +365,78 @@ th {
     margin-bottom: 7px;
 }
 
-.filter-field .form-control { min-width: 0; }
-.filter-status { margin-top: 12px; font-size: 12px; color: var(--muted); }
+.filter-field {
+    min-width: 0;
+    width: 100%;
+}
+
+.filter-field .form-control {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.filter-status {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+/* Filter tanggal responsif, terutama untuk Safari/iPhone */
+.filter-field input[type="date"],
+.filter-field input[type="month"] {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--dark);
+    border: 1px solid #C9DCD9;
+    border-radius: 8px;
+    background: #FFFFFF;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.filter-field input[type="date"]:focus,
+.filter-field input[type="month"]:focus,
+.filter-field select:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 1px;
+    border-color: var(--teal-dark);
+}
 
 @media (max-width: 620px) {
-    .filter-grid { grid-template-columns: 1fr; }
+    .filter-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    #panelRiwayatDetail,
+    #panelRiwayatDetail .filter-grid,
+    #panelRiwayatDetail .filter-field {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #panelRiwayatDetail .filter-field input,
+    #panelRiwayatDetail .filter-field select {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        font-size: 14px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .button-row .primary-btn,
+    .button-row .secondary-btn {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
 }
 
 .empty-state {
