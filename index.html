@@ -345,6 +345,27 @@ th {
     color: var(--dark);
 }
 
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.filter-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.filter-field .form-control { min-width: 0; }
+.filter-status { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+@media (max-width: 620px) {
+    .filter-grid { grid-template-columns: 1fr; }
+}
+
 .empty-state {
     padding: 30px 12px;
     text-align: center;
@@ -554,7 +575,7 @@ th {
         <button class="nav-btn active" data-page="dashboard"
                 onclick="bukaHalaman('dashboard')">Dashboard</button>
         <button class="nav-btn" data-page="peralatan"
-                onclick="bukaHalaman('peralatan')">Checklist Operasional</button>
+                onclick="bukaHalaman('peralatan')">Checklist Operational</button>
         <button class="nav-btn" data-page="riwayat"
                 onclick="bukaHalaman('riwayat')">Riwayat Checklist</button>
         <button class="nav-btn" data-page="rekap"
@@ -655,17 +676,17 @@ th {
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Aktif" checked>
-                                Normal
+                                Aktif
                             </label>
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Tidak Beroperasi">
-                                Tidak menyala / tidak beroperasi
+                                Tidak Beroperasi
                             </label>
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Dalam Perbaikan">
-                                Dalam perbaikan / sengaja dimatikan
+                                Dalam Perbaikan
                             </label>
                         </div>
                     </div>
@@ -696,7 +717,7 @@ th {
                 <div class="success-mark" id="ikonKonfirmasi">✓</div>
                 <h2 class="success-heading" id="judulKonfirmasi">Pemeriksaan Berhasil Disimpan</h2>
                 <p class="success-description" id="deskripsiKonfirmasi">
-                    Data pemeriksaan tersimpan di database SOUTH78.
+                    Data pemeriksaan sudah tersimpan di perangkat ini.
                 </p>
                 <div id="detailKonfirmasi"></div>
                 <div class="button-row">
@@ -714,15 +735,37 @@ th {
         <section class="page" id="page-riwayat">
             <div class="card">
                 <h2 class="section-title">Riwayat Pemeriksaan</h2>
-                <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:-6px">
-                    Pilih peralatan untuk melihat riwayat pemeriksaannya, atau buka semua riwayat untuk melihat seluruh aktivitas.
-                </p>
-                <div class="button-row" style="margin-bottom:16px">
-                    <button class="secondary-btn" type="button" onclick="muatRiwayatDariDatabase(true)">Muat Riwayat Terbaru</button>
-                    <button class="primary-btn" type="button" onclick="tampilkanSemuaRiwayat()">Semua Riwayat</button>
+                <div class="filter-grid">
+                    <div class="filter-field">
+                        <label for="riwayatModeFilter">Jenis Filter Tanggal</label>
+                        <select class="form-control" id="riwayatModeFilter" onchange="ubahModeFilter('riwayat')">
+                            <option value="rentang">Rentang tanggal</option>
+                            <option value="tanggal">Tanggal tertentu</option>
+                            <option value="bulan">Bulan tertentu</option>
+                        </select>
+                    </div>
+                    <div class="filter-field" id="riwayatRentangMulai">
+                        <label for="riwayatTanggalMulai">Dari tanggal</label>
+                        <input class="form-control" type="date" id="riwayatTanggalMulai" value="2026-10-01">
+                    </div>
+                    <div class="filter-field" id="riwayatRentangAkhir">
+                        <label for="riwayatTanggalAkhir">Sampai tanggal</label>
+                        <input class="form-control" type="date" id="riwayatTanggalAkhir" value="2026-10-23">
+                    </div>
+                    <div class="filter-field" id="riwayatTanggalTunggal" style="display:none">
+                        <label for="riwayatTanggalPilihan">Pilih tanggal</label>
+                        <input class="form-control" type="date" id="riwayatTanggalPilihan" value="2026-10-23">
+                    </div>
+                    <div class="filter-field" id="riwayatBulanPilihan" style="display:none">
+                        <label for="riwayatBulan">Pilih bulan</label>
+                        <input class="form-control" type="month" id="riwayatBulan" value="2026-10">
+                    </div>
                 </div>
-                <div id="daftarRiwayatPeralatan"></div>
-                <div id="tampilanRiwayatAlat" style="display:none"></div>
+                <div class="button-row">
+                    <button class="primary-btn" type="button" onclick="terapkanFilterTanggal('riwayat')">Terapkan Filter</button>
+                    <button class="secondary-btn" type="button" onclick="resetFilterTanggal('riwayat')">Reset Filter</button>
+                </div>
+                <div class="filter-status" id="riwayatFilterStatus">Menampilkan semua data sebelum filter diterapkan.</div>
                 <div class="table-wrap" id="tabelRiwayat"></div>
             </div>
         </section>
@@ -732,9 +775,39 @@ th {
             <div class="card">
                 <h2 class="section-title">Rekap Laporan</h2>
                 <p style="font-size:13px;color:var(--muted)">
-                    Unduh data pemeriksaan yang tersimpan di Google Sheets
-                    dalam format CSV untuk dibuka menggunakan Excel.
+                    Ringkasan dan ekspor akan mengikuti filter tanggal yang diterapkan.
                 </p>
+                <div class="filter-grid">
+                    <div class="filter-field">
+                        <label for="rekapModeFilter">Jenis Filter Tanggal</label>
+                        <select class="form-control" id="rekapModeFilter" onchange="ubahModeFilter('rekap')">
+                            <option value="rentang">Rentang tanggal</option>
+                            <option value="tanggal">Tanggal tertentu</option>
+                            <option value="bulan">Bulan tertentu</option>
+                        </select>
+                    </div>
+                    <div class="filter-field" id="rekapRentangMulai">
+                        <label for="rekapTanggalMulai">Dari tanggal</label>
+                        <input class="form-control" type="date" id="rekapTanggalMulai" value="2026-10-01">
+                    </div>
+                    <div class="filter-field" id="rekapRentangAkhir">
+                        <label for="rekapTanggalAkhir">Sampai tanggal</label>
+                        <input class="form-control" type="date" id="rekapTanggalAkhir" value="2026-10-23">
+                    </div>
+                    <div class="filter-field" id="rekapTanggalTunggal" style="display:none">
+                        <label for="rekapTanggalPilihan">Pilih tanggal</label>
+                        <input class="form-control" type="date" id="rekapTanggalPilihan" value="2026-10-23">
+                    </div>
+                    <div class="filter-field" id="rekapBulanPilihan" style="display:none">
+                        <label for="rekapBulan">Pilih bulan</label>
+                        <input class="form-control" type="month" id="rekapBulan" value="2026-10">
+                    </div>
+                </div>
+                <div class="button-row">
+                    <button class="primary-btn" type="button" onclick="terapkanFilterTanggal('rekap')">Terapkan Filter</button>
+                    <button class="secondary-btn" type="button" onclick="resetFilterTanggal('rekap')">Reset Filter</button>
+                </div>
+                <div class="filter-status" id="rekapFilterStatus">Menampilkan semua data sebelum filter diterapkan.</div>
                 <div class="button-row">
                     <button class="primary-btn" onclick="eksporCSV()">
                         Ekspor Laporan CSV
@@ -749,9 +822,9 @@ th {
             <div class="card">
                 <h2 class="section-title">Pengaturan</h2>
                 <p style="font-size:13px;line-height:1.7;color:var(--muted)">
-                    Riwayat pemeriksaan disimpan di Google Sheets agar dapat diakses
-                    dari perangkat lain. Tombol reset di bawah hanya menghapus
-                    riwayat lokal pada browser ini, bukan data pusat.
+                    Riwayat saat ini tersimpan pada browser/perangkat yang
+                    digunakan. Menghapus riwayat di halaman ini hanya
+                    menghapus data lokal browser tersebut.
                 </p>
                 <button class="danger-btn" onclick="resetRiwayat()">
                     Reset Semua Riwayat di Perangkat Ini
@@ -901,7 +974,6 @@ const KUNCI_RIWAYAT = "riwayatPemeriksaan";
 const URL_DATABASE =
     "https://script.google.com/macros/s/AKfycbzMsMTS9iqnhM42GcwQSiwHYd5PY3EN1pGZ1j5EG6rldKHEHOqavte00l1R9fMamLFp/exec";
 let peralatanAktif = null;
-let riwayatAlatDipilih = null;
 
 const parameterAlat = new URLSearchParams(
     window.location.search
@@ -935,97 +1007,6 @@ function bacaRiwayat() {
 }
 
 let riwayatPemeriksaan = bacaRiwayat();
-
-// Ubah data dari Google Sheets ke format yang dipakai aplikasi.
-function normalisasiDataDatabase(item) {
-    let pemeriksaan = item.detailChecklist || item.pemeriksaan || [];
-    if (typeof pemeriksaan === "string") {
-        try { pemeriksaan = JSON.parse(pemeriksaan); }
-        catch (error) { pemeriksaan = []; }
-    }
-    if (!Array.isArray(pemeriksaan)) pemeriksaan = [];
-
-    const namaAlat = String(item.peralatan || "");
-    const alatDitemukan = daftarAlat.find(alat =>
-        alat.nama.toLowerCase() === namaAlat.toLowerCase()
-    );
-
-    let waktu = item.waktu || "";
-    // Gabungkan kolom tanggal dan waktu dari Google Sheets.
-    if (item.tanggal) {
-        const tanggal = String(item.tanggal);
-        const jamMentah = String(item.waktu || "00:00:00");
-        const bagianTanggal = tanggal.split(/[\/.-]/).map(Number);
-        if (bagianTanggal.length === 3 && bagianTanggal.every(Number.isFinite)) {
-            let hari, bulan, tahun;
-            if (bagianTanggal[0] > 31) {
-                [tahun, bulan, hari] = bagianTanggal;
-            } else {
-                [hari, bulan, tahun] = bagianTanggal;
-            }
-            // Bila sel waktu berupa ISO dari Google Sheets, ambil jamnya saja.
-            let jamBersih = jamMentah;
-            if (jamMentah.includes("T")) {
-                const potonganJam = jamMentah.match(/T(\d{2}:\d{2}:\d{2})/);
-                jamBersih = potonganJam ? potonganJam[1] : "00:00:00";
-            } else {
-                jamBersih = jamMentah.replace(/\./g, ":");
-                if (/^\d{1,2}:\d{2}$/.test(jamBersih)) jamBersih += ":00";
-                if (!/^\d{1,2}:\d{2}:\d{2}$/.test(jamBersih)) jamBersih = "00:00:00";
-            }
-            const tanggalISO = `${tahun}-${String(bulan).padStart(2,"0")}-${String(hari).padStart(2,"0")}`;
-            const waktuCoba = new Date(`${tanggalISO}T${jamBersih}`);
-            waktu = isNaN(waktuCoba.getTime()) ? new Date().toISOString() : waktuCoba.toISOString();
-        }
-    }
-    if (!waktu || isNaN(new Date(waktu).getTime())) waktu = new Date().toISOString();
-
-    return {
-        id: String(item.id || `${Date.now()}-${Math.random().toString(36).slice(2,8)}`),
-        peralatan: namaAlat || "Peralatan tidak diketahui",
-        alatId: item.alatId || (alatDitemukan ? alatDitemukan.id : ""),
-        kategori: item.kategori || (alatDitemukan ? alatDitemukan.kategori : ""),
-        lokasi: item.lokasi || (alatDitemukan ? alatDitemukan.lokasi : ""),
-        petugas: item.petugas || "-",
-        status: item.status === "Normal" ? "Aktif" : (item.status || "Aktif"),
-        catatan: item.catatan || "Tidak ada catatan",
-        waktu: waktu,
-        pemeriksaan: pemeriksaan
-    };
-}
-
-// Ambil data pusat supaya riwayat dapat tampil di perangkat berbeda.
-async function muatRiwayatDariDatabase(tampilkanPesan = false) {
-    try {
-        const response = await fetch(URL_DATABASE, { method: "GET", cache: "no-store" });
-        if (!response.ok) throw new Error("Respons server tidak berhasil.");
-        const hasil = await response.json();
-        if (!hasil.sukses || !Array.isArray(hasil.data)) {
-            throw new Error(hasil.pesan || "Format data database tidak sesuai.");
-        }
-
-        const dataPusat = hasil.data.map(normalisasiDataDatabase);
-        const gabungan = new Map();
-        // Data pusat dipakai sebagai sumber utama; data lokal dipertahankan bila belum terkirim.
-        dataPusat.forEach(item => gabungan.set(String(item.id), item));
-        riwayatPemeriksaan.forEach(item => {
-            if (!gabungan.has(String(item.id))) gabungan.set(String(item.id), item);
-        });
-        riwayatPemeriksaan = Array.from(gabungan.values()).sort((a, b) =>
-            new Date(b.waktu).getTime() - new Date(a.waktu).getTime()
-        );
-        localStorage.setItem(KUNCI_RIWAYAT, JSON.stringify(riwayatPemeriksaan));
-        perbaruiDashboard();
-        tampilkanRiwayat();
-        tampilkanRekap();
-        if (tampilkanPesan) alert("Riwayat berhasil dimuat dari database SOUTH78.");
-        return true;
-    } catch (error) {
-        console.error("Gagal memuat riwayat dari Google Sheets:", error);
-        if (tampilkanPesan) alert("Riwayat database belum berhasil dimuat. Periksa koneksi internet lalu coba lagi.");
-        return false;
-    }
-}
 
 
 /* =========================================
@@ -1326,8 +1307,6 @@ alert("Checklist berhasil disimpan!");
             tampilkanRekap();
             tampilkanKonfirmasi(hasil, false);
         } else {
-            tampilkanRiwayat();
-            tampilkanRekap();
             alert("Pemeriksaan berhasil disimpan.");
             bukaHalaman("riwayat");
         }
@@ -1358,16 +1337,9 @@ function kelasStatus(status) {
     return "";
 }
 
-function labelStatus(status) {
-    if (status === "Aktif" || status === "Normal") return "Normal";
-    if (status === "Tidak Beroperasi") return "Tidak menyala / tidak beroperasi";
-    if (status === "Dalam Perbaikan") return "Dalam perbaikan / sengaja dimatikan";
-    return status || "-";
-}
-
 function badgeStatus(status) {
     return `<span class="status-badge ${kelasStatus(status)}">
-        ${escapeHTML(labelStatus(status))}
+        ${status}
     </span>`;
 }
 
@@ -1378,7 +1350,7 @@ function tampilkanKonfirmasi(hasil, isLastRecord) {
         : "Pemeriksaan Berhasil Disimpan";
     document.getElementById("deskripsiKonfirmasi").textContent = isLastRecord
         ? "Berikut status pemeriksaan terakhir yang tersimpan untuk peralatan pada QR ini."
-        : "Data pemeriksaan tersimpan dan sedang disinkronkan dengan database SOUTH78.";
+        : "Data pemeriksaan kamu berhasil disimpan di browser/perangkat ini.";
 
     const detail = document.getElementById("detailKonfirmasi");
     detail.innerHTML = `
@@ -1450,133 +1422,158 @@ function perbaruiDashboard() {
 
 
 /* =========================================
+   FILTER TANGGAL RIWAYAT DAN REKAP
+========================================= */
+
+const filterTanggalAktif = {
+    riwayat: null,
+    rekap: null
+};
+
+function nilaiFilter(prefix, suffix) {
+    const el = document.getElementById(prefix + suffix);
+    return el ? el.value : "";
+}
+
+function ubahModeFilter(prefix) {
+    const mode = nilaiFilter(prefix, "ModeFilter");
+    const rentang = mode === "rentang";
+    const tunggal = mode === "tanggal";
+    const bulanan = mode === "bulan";
+
+    document.getElementById(prefix + "RentangMulai").style.display = rentang ? "block" : "none";
+    document.getElementById(prefix + "RentangAkhir").style.display = rentang ? "block" : "none";
+    document.getElementById(prefix + "TanggalTunggal").style.display = tunggal ? "block" : "none";
+    document.getElementById(prefix + "BulanPilihan").style.display = bulanan ? "block" : "none";
+}
+
+function ambilTanggalData(item) {
+    if (item.waktu) {
+        const d = new Date(item.waktu);
+        if (!isNaN(d.getTime())) return [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"), String(d.getDate()).padStart(2,"0")].join("-");
+    }
+    // Kompatibilitas jika data lama dari Google Sheets menyimpan tanggal terpisah.
+    if (item.tanggal) {
+        const iso = String(item.tanggal).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (iso) return iso[0];
+        const id = String(item.tanggal).match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+        if (id) return `${id[3]}-${String(id[2]).padStart(2,"0")}-${String(id[1]).padStart(2,"0")}`;
+    }
+    return "";
+}
+
+function dataDenganFilter(jenis) {
+    const filter = filterTanggalAktif[jenis];
+    if (!filter) return riwayatPemeriksaan.slice();
+
+    return riwayatPemeriksaan.filter(item => {
+        const tanggalData = ambilTanggalData(item);
+        if (!tanggalData) return false;
+        if (filter.mode === "rentang") return tanggalData >= filter.mulai && tanggalData <= filter.akhir;
+        if (filter.mode === "tanggal") return tanggalData === filter.tanggal;
+        if (filter.mode === "bulan") return tanggalData.startsWith(filter.bulan);
+        return true;
+    });
+}
+
+function terapkanFilterTanggal(jenis) {
+    const prefix = jenis;
+    const mode = nilaiFilter(prefix, "ModeFilter");
+    let filter;
+
+    if (mode === "rentang") {
+        const mulai = nilaiFilter(prefix, "TanggalMulai");
+        const akhir = nilaiFilter(prefix, "TanggalAkhir");
+        if (!mulai || !akhir) { alert("Pilih tanggal awal dan akhir terlebih dahulu."); return; }
+        if (mulai > akhir) { alert("Tanggal awal tidak boleh melewati tanggal akhir."); return; }
+        filter = { mode, mulai, akhir };
+    } else if (mode === "tanggal") {
+        const tanggal = nilaiFilter(prefix, "TanggalPilihan");
+        if (!tanggal) { alert("Pilih tanggal terlebih dahulu."); return; }
+        filter = { mode, tanggal };
+    } else {
+        const bulan = nilaiFilter(prefix, "Bulan");
+        if (!bulan) { alert("Pilih bulan terlebih dahulu."); return; }
+        filter = { mode, bulan };
+    }
+
+    filterTanggalAktif[jenis] = filter;
+    const jumlah = dataDenganFilter(jenis).length;
+    const ringkasan = mode === "rentang" ? `${filter.mulai} s.d. ${filter.akhir}` : mode === "tanggal" ? filter.tanggal : filter.bulan;
+    document.getElementById(prefix + "FilterStatus").textContent = `Filter aktif: ${ringkasan} — ${jumlah} pemeriksaan ditemukan.`;
+
+    if (jenis === "riwayat") tampilkanRiwayat();
+    else { tampilkanRekap(); }
+}
+
+function resetFilterTanggal(jenis) {
+    const prefix = jenis;
+    document.getElementById(prefix + "ModeFilter").value = "rentang";
+    document.getElementById(prefix + "TanggalMulai").value = "2026-10-01";
+    document.getElementById(prefix + "TanggalAkhir").value = "2026-10-23";
+    document.getElementById(prefix + "TanggalPilihan").value = "2026-10-23";
+    document.getElementById(prefix + "Bulan").value = "2026-10";
+    filterTanggalAktif[jenis] = null;
+    document.getElementById(prefix + "FilterStatus").textContent = "Filter direset. Menampilkan semua riwayat pemeriksaan.";
+    ubahModeFilter(prefix);
+    if (jenis === "riwayat") tampilkanRiwayat();
+    else tampilkanRekap();
+}
+
+/* =========================================
    9. RIWAYAT PEMERIKSAAN
 ========================================= */
 
 function tampilkanRiwayat() {
     const area = document.getElementById("tabelRiwayat");
-    const daftar = document.getElementById("daftarRiwayatPeralatan");
-    const detail = document.getElementById("tampilanRiwayatAlat");
+    const dataTerfilter = dataDenganFilter("riwayat");
+    const dataRiwayat = modeQR
+        ? dataTerfilter.filter(item => item.alatId === parameterAlat)
+        : dataTerfilter;
 
-    // Jika dibuka melalui QR, langsung tampilkan riwayat peralatan dari QR tersebut.
-    if (modeQR) {
-        daftar.style.display = "none";
-        detail.style.display = "none";
-        area.style.display = "block";
-        const dataQR = riwayatPemeriksaan.filter(item => item.alatId === parameterAlat);
-        area.innerHTML = renderTabelRiwayat(dataQR, true);
-        return;
-    }
-
-    area.style.display = "none";
-    daftar.style.display = riwayatAlatDipilih ? "none" : "block";
-    detail.style.display = riwayatAlatDipilih ? "block" : "none";
-
-    if (riwayatAlatDipilih === "__semua__") {
-        detail.innerHTML = `
-            <div class="button-row" style="margin-bottom:16px">
-                <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
-            </div>
-            <h3 style="margin:0 0 16px">Semua Riwayat Pemeriksaan</h3>
-            ${renderTabelRiwayat(riwayatPemeriksaan, false)}
-        `;
-        return;
-    }
-
-    if (riwayatAlatDipilih) {
-        const alat = daftarAlat.find(item => item.id === riwayatAlatDipilih);
-        const dataAlat = riwayatPemeriksaan.filter(item => item.alatId === riwayatAlatDipilih);
-        detail.innerHTML = `
-            <div class="button-row" style="margin-bottom:16px">
-                <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
-                <button class="secondary-btn" type="button" onclick="tampilkanSemuaRiwayat()">Semua Riwayat</button>
-            </div>
-            <h3 style="margin:0 0 5px">${escapeHTML(alat ? alat.nama : "Riwayat Peralatan")}</h3>
-            <p style="font-size:13px;color:var(--muted);margin:0 0 16px">${escapeHTML(alat ? alat.lokasi : "")}</p>
-            ${renderTabelRiwayat(dataAlat, false)}
-        `;
-        return;
-    }
-
-    daftar.innerHTML = `
-        <div class="grid">
-            ${daftarAlat.map(alat => {
-                const jumlah = riwayatPemeriksaan.filter(item => item.alatId === alat.id).length;
-                return `
-                    <div class="card equipment-card">
-                        <div class="equipment-icon">${alat.ikon}</div>
-                        <h3>${escapeHTML(alat.nama)}</h3>
-                        <p>${escapeHTML(alat.lokasi)}</p>
-                        <p>${jumlah} pemeriksaan tersimpan</p>
-                        <button class="primary-btn full-btn" type="button" onclick="bukaRiwayatPeralatan('${alat.id}')">Buka Riwayat</button>
-                    </div>
-                `;
-            }).join("")}
-        </div>
-    `;
-}
-
-function bukaRiwayatPeralatan(id) {
-    riwayatAlatDipilih = id;
-    tampilkanRiwayat();
-}
-
-function kembaliKeDaftarRiwayat() {
-    riwayatAlatDipilih = null;
-    tampilkanRiwayat();
-}
-
-function tampilkanSemuaRiwayat() {
-    riwayatAlatDipilih = "__semua__";
-    const area = document.getElementById("tabelRiwayat");
-    const daftar = document.getElementById("daftarRiwayatPeralatan");
-    const detail = document.getElementById("tampilanRiwayatAlat");
-    if (modeQR) {
-        tampilkanRiwayat();
-        return;
-    }
-    daftar.style.display = "none";
-    detail.style.display = "block";
-    area.style.display = "none";
-    detail.innerHTML = `
-        <div class="button-row" style="margin-bottom:16px">
-            <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
-        </div>
-        <h3 style="margin:0 0 16px">Semua Riwayat Pemeriksaan</h3>
-        ${renderTabelRiwayat(riwayatPemeriksaan, false)}
-    `;
-}
-
-function renderTabelRiwayat(dataRiwayat, modeQRView) {
     let tombolKembali = "";
-    if (modeQRView) {
+    if (modeQR) {
         tombolKembali = '<div class="button-row" style="margin-top:0;margin-bottom:16px"><button class="secondary-btn" type="button" onclick="kembaliKeChecklistQR()">Kembali ke Checklist</button></div>';
     }
-    if (!dataRiwayat.length) {
-        return tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan untuk pilihan ini.</div>';
+
+    if (dataRiwayat.length === 0) {
+        area.innerHTML = tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
+        return;
     }
-    return tombolKembali + `
-        <div class="table-wrap">
+
+    const tabel = `
         <table>
-            <thead><tr><th>Waktu</th><th>Peralatan</th><th>Petugas</th><th>Status</th><th>Checklist</th><th>Catatan</th></tr></thead>
+            <thead>
+                <tr>
+                    <th>Waktu</th>
+                    <th>Peralatan</th>
+                    <th>Petugas</th>
+                    <th>Status</th>
+                    <th>Checklist</th>
+                    <th>Catatan</th>
+                </tr>
+            </thead>
             <tbody>
                 ${dataRiwayat.map(item => {
-                    const pemeriksaan = Array.isArray(item.pemeriksaan) ? item.pemeriksaan : [];
-                    const total = pemeriksaan.length;
-                    const selesai = pemeriksaan.filter(p => p.selesai).length;
-                    return `<tr>
-                        <td>${formatTanggal(item.waktu)}</td>
-                        <td>${escapeHTML(item.peralatan || "-")}</td>
-                        <td>${escapeHTML(item.petugas || "-")}</td>
-                        <td>${badgeStatus(item.status || "Aktif")}</td>
-                        <td>${selesai}/${total} poin</td>
-                        <td>${escapeHTML(item.catatan || "-")}</td>
-                    </tr>`;
+                    const total = (item.pemeriksaan || []).length;
+                    const selesai = (item.pemeriksaan || [])
+                        .filter(p => p.selesai).length;
+
+                    return `
+                        <tr>
+                            <td>${formatTanggal(item.waktu)}</td>
+                            <td>${escapeHTML(item.peralatan || "-")}</td>
+                            <td>${escapeHTML(item.petugas || "-")}</td>
+                            <td>${badgeStatus(item.status || "Aktif")}</td>
+                            <td>${selesai}/${total} poin</td>
+                            <td>${escapeHTML(item.catatan || "-")}</td>
+                        </tr>
+                    `;
                 }).join("")}
             </tbody>
         </table>
-        </div>
     `;
+    area.innerHTML = tombolKembali + tabel;
 }
 
 /* =========================================
@@ -1586,22 +1583,15 @@ function renderTabelRiwayat(dataRiwayat, modeQRView) {
 function tampilkanRekap() {
     const area = document.getElementById("ringkasanRekap");
 
-    const jumlahAktif = riwayatPemeriksaan.filter(
-        item => item.status === "Aktif"
-    ).length;
-
-    const jumlahTidakBeroperasi = riwayatPemeriksaan.filter(
-        item => item.status === "Tidak Beroperasi"
-    ).length;
-
-    const jumlahPerbaikan = riwayatPemeriksaan.filter(
-        item => item.status === "Dalam Perbaikan"
-    ).length;
+    const dataRekap = dataDenganFilter("rekap");
+    const jumlahAktif = dataRekap.filter(item => item.status === "Aktif").length;
+    const jumlahTidakBeroperasi = dataRekap.filter(item => item.status === "Tidak Beroperasi").length;
+    const jumlahPerbaikan = dataRekap.filter(item => item.status === "Dalam Perbaikan").length;
 
     area.innerHTML = `
         <h3 style="font-size:15px">Ringkasan Data</h3>
         <p style="font-size:13px">Total pemeriksaan:
-            <strong>${riwayatPemeriksaan.length}</strong></p>
+            <strong>${dataRekap.length}</strong></p>
         <p style="font-size:13px">Aktif:
             <strong>${jumlahAktif}</strong></p>
         <p style="font-size:13px">Tidak Beroperasi:
@@ -1612,7 +1602,8 @@ function tampilkanRekap() {
 }
 
 function eksporCSV() {
-    if (riwayatPemeriksaan.length === 0) {
+    const dataEkspor = dataDenganFilter("rekap");
+    if (dataEkspor.length === 0) {
         alert("Belum ada data untuk diekspor.");
         return;
     }
@@ -1628,7 +1619,7 @@ function eksporCSV() {
         "Catatan"
     ];
 
-    const baris = riwayatPemeriksaan.map(item => {
+    const baris = dataEkspor.map(item => {
         const daftarPoin = item.pemeriksaan || [];
         const selesai = daftarPoin.filter(p => p.selesai).length;
 
@@ -1740,13 +1731,12 @@ function mulaiAplikasi() {
     perbaruiDashboard();
     tampilkanRiwayat();
     tampilkanRekap();
+    ubahModeFilter("riwayat");
+    ubahModeFilter("rekap");
 
     if (modeQR) {
         pilihPeralatan(parameterAlat);
     }
-
-    // Memuat riwayat bersama dari Google Sheets setelah tampilan awal siap.
-    muatRiwayatDariDatabase(false);
 }
 
 mulaiAplikasi();
