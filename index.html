@@ -1088,6 +1088,102 @@ function bacaRiwayat() {
 
 let riwayatPemeriksaan = bacaRiwayat();
 
+// Mengubah baris Google Sheets menjadi format yang dipakai aplikasi.
+function normalisasiDataOnline(item) {
+    if (!item || typeof item !== "object") return null;
+
+    const peralatan = item.peralatan || item.namaPeralatan || "Peralatan";
+    const alatDitemukan = daftarAlat.find(a => a.id === item.alatId) ||
+        daftarAlat.find(a => a.nama === peralatan);
+
+    let waktu = item.waktu || item.timestamp || "";
+    if (waktu && !Number.isNaN(Date.parse(waktu))) {
+        waktu = new Date(waktu).toISOString();
+    } else {
+        const tanggalMentah = String(item.tanggal || "").trim();
+        const jam = String(item.waktu || "00:00:00").trim().replace(/\./g, ":");
+        let tanggalISO = "";
+        let m = tanggalMentah.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (m) tanggalISO = `${m[1]}-${m[2]}-${m[3]}`;
+        else {
+            m = tanggalMentah.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);
+            if (m) tanggalISO = `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+        }
+        waktu = tanggalISO ? new Date(`${tanggalISO}T${jam}`).toISOString() : new Date().toISOString();
+    }
+
+    let pemeriksaan = item.pemeriksaan ?? item.detailChecklist ?? [];
+    if (typeof pemeriksaan === "string") {
+        try { pemeriksaan = JSON.parse(pemeriksaan); }
+        catch (_) {
+            pemeriksaan = pemeriksaan.split(/\s*\|\s*/).filter(Boolean).map(teks => ({
+                poin: teks.replace(/^[✓✔☑]\s*/, "").replace(/^[✗✘☒]\s*/, ""),
+                selesai: /^[✓✔☑]/.test(teks)
+            }));
+        }
+    }
+    if (!Array.isArray(pemeriksaan)) pemeriksaan = [];
+    pemeriksaan = pemeriksaan.map(p => {
+        if (typeof p === "string") return { poin: p.replace(/^[✓✔☑]\s*/, ""), selesai: /^[✓✔☑]/.test(p) };
+        return { poin: p.poin || p.nama || "Checklist", selesai: Boolean(p.selesai ?? p.checked) };
+    });
+
+    return {
+        id: String(item.id || `${waktu}-${peralatan}-${item.petugas || ""}`),
+        peralatan,
+        alatId: item.alatId || alatDitemukan?.id || "",
+        kategori: item.kategori || alatDitemukan?.kategori || "",
+        lokasi: item.lokasi || alatDitemukan?.lokasi || "-",
+        petugas: item.petugas || "-",
+        status: item.status === "Normal" ? "Aktif" : (item.status || "Aktif"),
+        catatan: item.catatan || "Tidak ada catatan",
+        waktu,
+        tanggal: item.tanggal || "",
+        pemeriksaan
+    };
+}
+
+function gabungkanRiwayat(dataBaru) {
+    const gabungan = new Map();
+    [...riwayatPemeriksaan, ...dataBaru].forEach(item => {
+        if (!item) return;
+        const kunci = String(item.id || `${item.waktu}|${item.peralatan}|${item.petugas}`);
+        // Data online lebih lengkap/terbaru diprioritaskan untuk ID yang sama.
+        gabungan.set(kunci, { ...(gabungan.get(kunci) || {}), ...item });
+    });
+    riwayatPemeriksaan = Array.from(gabungan.values()).sort((a, b) =>
+        new Date(b.waktu || 0).getTime() - new Date(a.waktu || 0).getTime()
+    );
+    try {
+        localStorage.setItem(KUNCI_RIWAYAT, JSON.stringify(riwayatPemeriksaan));
+    } catch (error) {
+        console.warn("Riwayat gabungan tidak dapat disimpan ke browser:", error);
+    }
+}
+
+async function muatRiwayatOnline(tampilkanPesan = false) {
+    try {
+        const pemisah = URL_DATABASE.includes("?") ? "&" : "?";
+        const response = await fetch(URL_DATABASE + pemisah + "t=" + Date.now(), { method: "GET", cache: "no-store" });
+        if (!response.ok) throw new Error("HTTP " + response.status);
+        const hasil = await response.json();
+        if (!hasil || hasil.sukses !== true || !Array.isArray(hasil.data)) {
+            throw new Error("Format data Google Sheets tidak sesuai.");
+        }
+        const dataOnline = hasil.data.map(normalisasiDataOnline).filter(Boolean);
+        gabungkanRiwayat(dataOnline);
+        perbaruiDashboard();
+        tampilkanRiwayat();
+        tampilkanRekap();
+        if (tampilkanPesan) alert(`Sinkronisasi selesai. ${dataOnline.length} data ditemukan di Google Sheets.`);
+        return true;
+    } catch (error) {
+        console.error("Gagal memuat riwayat Google Sheets:", error);
+        if (tampilkanPesan) alert("Riwayat online belum berhasil dimuat. Periksa koneksi internet dan akses Google Apps Script.");
+        return false;
+    }
+}
+
 
 /* =========================================
    3. NAVIGASI HALAMAN
@@ -1337,8 +1433,7 @@ try {
 }
 
 // Kirim data pemeriksaan ke Google Sheets
-const URL_GOOGLE_SHEETS =
-    "https://script.google.com/macros/s/AKfycbzMsMTS9iqnhM42GcwQSiwHYd5PY3EN1pGZ1j5EG6rldKHEHOqavte00l1R9fMamLFp/exec";
+const URL_GOOGLE_SHEETS = URL_DATABASE;
 
 const waktuPemeriksaan = new Date(hasil.waktu);
 
@@ -1360,6 +1455,7 @@ fetch(URL_GOOGLE_SHEETS, {
 .then(data => {
     if (data.sukses) {
         console.log("Data berhasil dikirim ke Google Sheets.");
+        muatRiwayatOnline(false);
     } else {
         console.error("Google Sheets:", data.pesan);
         alert(
@@ -1854,6 +1950,9 @@ function mulaiAplikasi() {
     if (modeQR) {
         pilihPeralatan(parameterAlat);
     }
+
+    // Tampilkan data lokal dahulu, kemudian sinkronkan riwayat bersama dari Google Sheets.
+    muatRiwayatOnline(false);
 }
 
 mulaiAplikasi();
