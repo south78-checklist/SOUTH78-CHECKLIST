@@ -736,6 +736,12 @@ th {
             <div class="card">
                 <h2 class="section-title">Riwayat Pemeriksaan</h2>
                 <div class="filter-grid">
+                    <div class="filter-field" id="riwayatPilihanPeralatan">
+                        <label for="riwayatFilterAlat">Pilih Peralatan</label>
+                        <select class="form-control" id="riwayatFilterAlat" onchange="tampilkanRiwayat()">
+                            <option value="semua">Semua peralatan</option>
+                        </select>
+                    </div>
                     <div class="filter-field">
                         <label for="riwayatModeFilter">Jenis Filter Tanggal</label>
                         <select class="form-control" id="riwayatModeFilter" onchange="ubahModeFilter('riwayat')">
@@ -1498,7 +1504,13 @@ function terapkanFilterTanggal(jenis) {
     }
 
     filterTanggalAktif[jenis] = filter;
-    const jumlah = dataDenganFilter(jenis).length;
+    let dataHitung = dataDenganFilter(jenis);
+    if (jenis === "riwayat") {
+        const pilihanAlat = document.getElementById("riwayatFilterAlat")?.value || "semua";
+        if (modeQR) dataHitung = dataHitung.filter(item => item.alatId === parameterAlat);
+        else if (pilihanAlat !== "semua") dataHitung = dataHitung.filter(item => item.alatId === pilihanAlat);
+    }
+    const jumlah = dataHitung.length;
     const ringkasan = mode === "rentang" ? `${filter.mulai} s.d. ${filter.akhir}` : mode === "tanggal" ? filter.tanggal : filter.bulan;
     document.getElementById(prefix + "FilterStatus").textContent = `Filter aktif: ${ringkasan} — ${jumlah} pemeriksaan ditemukan.`;
 
@@ -1508,11 +1520,15 @@ function terapkanFilterTanggal(jenis) {
 
 function resetFilterTanggal(jenis) {
     const prefix = jenis;
+    const hariIni = new Date();
+    const tanggalHariIni = [hariIni.getFullYear(), String(hariIni.getMonth()+1).padStart(2,"0"), String(hariIni.getDate()).padStart(2,"0")].join("-");
+    const bulanIni = tanggalHariIni.slice(0, 7);
     document.getElementById(prefix + "ModeFilter").value = "rentang";
-    document.getElementById(prefix + "TanggalMulai").value = "2026-10-01";
-    document.getElementById(prefix + "TanggalAkhir").value = "2026-10-23";
-    document.getElementById(prefix + "TanggalPilihan").value = "2026-10-23";
-    document.getElementById(prefix + "Bulan").value = "2026-10";
+    document.getElementById(prefix + "TanggalMulai").value = bulanIni + "-01";
+    document.getElementById(prefix + "TanggalAkhir").value = tanggalHariIni;
+    document.getElementById(prefix + "TanggalPilihan").value = tanggalHariIni;
+    document.getElementById(prefix + "Bulan").value = bulanIni;
+    if (jenis === "riwayat" && !modeQR) document.getElementById("riwayatFilterAlat").value = "semua";
     filterTanggalAktif[jenis] = null;
     document.getElementById(prefix + "FilterStatus").textContent = "Filter direset. Menampilkan semua riwayat pemeriksaan.";
     ubahModeFilter(prefix);
@@ -1524,12 +1540,29 @@ function resetFilterTanggal(jenis) {
    9. RIWAYAT PEMERIKSAAN
 ========================================= */
 
+function siapkanFilterPeralatanRiwayat() {
+    const pilih = document.getElementById("riwayatFilterAlat");
+    if (!pilih) return;
+    const nilaiSebelumnya = pilih.value || "semua";
+    pilih.innerHTML = '<option value="semua">Semua peralatan</option>' + daftarAlat.map(alat =>
+        `<option value="${alat.id}">${escapeHTML(alat.nama)}</option>`
+    ).join("");
+    pilih.value = daftarAlat.some(alat => alat.id === nilaiSebelumnya) || nilaiSebelumnya === "semua" ? nilaiSebelumnya : "semua";
+    if (modeQR) {
+        const field = document.getElementById("riwayatPilihanPeralatan");
+        if (field) field.style.display = "none";
+    }
+}
+
 function tampilkanRiwayat() {
     const area = document.getElementById("tabelRiwayat");
+    siapkanFilterPeralatanRiwayat();
     const dataTerfilter = dataDenganFilter("riwayat");
-    const dataRiwayat = modeQR
+    const pilihanAlat = document.getElementById("riwayatFilterAlat")?.value || "semua";
+    let dataRiwayat = modeQR
         ? dataTerfilter.filter(item => item.alatId === parameterAlat)
-        : dataTerfilter;
+        : (pilihanAlat === "semua" ? dataTerfilter : dataTerfilter.filter(item => item.alatId === pilihanAlat));
+    dataRiwayat = dataRiwayat.slice().sort((a, b) => new Date(b.waktu || b.tanggal || 0) - new Date(a.waktu || a.tanggal || 0));
 
     let tombolKembali = "";
     if (modeQR) {
@@ -1537,7 +1570,9 @@ function tampilkanRiwayat() {
     }
 
     if (dataRiwayat.length === 0) {
-        area.innerHTML = tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
+        area.innerHTML = tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan untuk pilihan peralatan/tanggal ini.</div>';
+        const statusFilter = document.getElementById("riwayatFilterStatus");
+        if (statusFilter && filterTanggalAktif.riwayat) statusFilter.textContent = "Tidak ada pemeriksaan yang cocok dengan filter saat ini.";
         return;
     }
 
@@ -1574,6 +1609,12 @@ function tampilkanRiwayat() {
         </table>
     `;
     area.innerHTML = tombolKembali + tabel;
+    const statusFilter = document.getElementById("riwayatFilterStatus");
+    if (statusFilter && filterTanggalAktif.riwayat) {
+        const f = filterTanggalAktif.riwayat;
+        const ringkasan = f.mode === "rentang" ? `${f.mulai} s.d. ${f.akhir}` : f.mode === "tanggal" ? f.tanggal : f.bulan;
+        statusFilter.textContent = `Filter aktif: ${ringkasan} — ${dataRiwayat.length} pemeriksaan ditemukan.`;
+    }
 }
 
 /* =========================================
