@@ -554,7 +554,7 @@ th {
         <button class="nav-btn active" data-page="dashboard"
                 onclick="bukaHalaman('dashboard')">Dashboard</button>
         <button class="nav-btn" data-page="peralatan"
-                onclick="bukaHalaman('peralatan')">Checklist Operational</button>
+                onclick="bukaHalaman('peralatan')">Checklist Operasional</button>
         <button class="nav-btn" data-page="riwayat"
                 onclick="bukaHalaman('riwayat')">Riwayat Checklist</button>
         <button class="nav-btn" data-page="rekap"
@@ -655,17 +655,17 @@ th {
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Aktif" checked>
-                                Aktif
+                                Normal
                             </label>
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Tidak Beroperasi">
-                                Tidak Beroperasi
+                                Tidak menyala / tidak beroperasi
                             </label>
                             <label class="status-option">
                                 <input type="radio" name="status"
                                        value="Dalam Perbaikan">
-                                Dalam Perbaikan
+                                Dalam perbaikan / sengaja dimatikan
                             </label>
                         </div>
                     </div>
@@ -696,7 +696,7 @@ th {
                 <div class="success-mark" id="ikonKonfirmasi">✓</div>
                 <h2 class="success-heading" id="judulKonfirmasi">Pemeriksaan Berhasil Disimpan</h2>
                 <p class="success-description" id="deskripsiKonfirmasi">
-                    Data pemeriksaan sudah tersimpan di perangkat ini.
+                    Data pemeriksaan tersimpan di database SOUTH78.
                 </p>
                 <div id="detailKonfirmasi"></div>
                 <div class="button-row">
@@ -714,6 +714,9 @@ th {
         <section class="page" id="page-riwayat">
             <div class="card">
                 <h2 class="section-title">Riwayat Pemeriksaan</h2>
+                <div class="button-row" style="margin-bottom:16px">
+                    <button class="secondary-btn" type="button" onclick="muatRiwayatDariDatabase(true)">Muat Riwayat Terbaru</button>
+                </div>
                 <div class="table-wrap" id="tabelRiwayat"></div>
             </div>
         </section>
@@ -723,7 +726,7 @@ th {
             <div class="card">
                 <h2 class="section-title">Rekap Laporan</h2>
                 <p style="font-size:13px;color:var(--muted)">
-                    Unduh data pemeriksaan yang tersimpan di browser ini
+                    Unduh data pemeriksaan yang tersimpan di Google Sheets
                     dalam format CSV untuk dibuka menggunakan Excel.
                 </p>
                 <div class="button-row">
@@ -740,9 +743,9 @@ th {
             <div class="card">
                 <h2 class="section-title">Pengaturan</h2>
                 <p style="font-size:13px;line-height:1.7;color:var(--muted)">
-                    Riwayat saat ini tersimpan pada browser/perangkat yang
-                    digunakan. Menghapus riwayat di halaman ini hanya
-                    menghapus data lokal browser tersebut.
+                    Riwayat pemeriksaan disimpan di Google Sheets agar dapat diakses
+                    dari perangkat lain. Tombol reset di bawah hanya menghapus
+                    riwayat lokal pada browser ini, bukan data pusat.
                 </p>
                 <button class="danger-btn" onclick="resetRiwayat()">
                     Reset Semua Riwayat di Perangkat Ini
@@ -925,6 +928,97 @@ function bacaRiwayat() {
 }
 
 let riwayatPemeriksaan = bacaRiwayat();
+
+// Ubah data dari Google Sheets ke format yang dipakai aplikasi.
+function normalisasiDataDatabase(item) {
+    let pemeriksaan = item.detailChecklist || item.pemeriksaan || [];
+    if (typeof pemeriksaan === "string") {
+        try { pemeriksaan = JSON.parse(pemeriksaan); }
+        catch (error) { pemeriksaan = []; }
+    }
+    if (!Array.isArray(pemeriksaan)) pemeriksaan = [];
+
+    const namaAlat = String(item.peralatan || "");
+    const alatDitemukan = daftarAlat.find(alat =>
+        alat.nama.toLowerCase() === namaAlat.toLowerCase()
+    );
+
+    let waktu = item.waktu || "";
+    // Gabungkan kolom tanggal dan waktu dari Google Sheets.
+    if (item.tanggal) {
+        const tanggal = String(item.tanggal);
+        const jamMentah = String(item.waktu || "00:00:00");
+        const bagianTanggal = tanggal.split(/[\/.-]/).map(Number);
+        if (bagianTanggal.length === 3 && bagianTanggal.every(Number.isFinite)) {
+            let hari, bulan, tahun;
+            if (bagianTanggal[0] > 31) {
+                [tahun, bulan, hari] = bagianTanggal;
+            } else {
+                [hari, bulan, tahun] = bagianTanggal;
+            }
+            // Bila sel waktu berupa ISO dari Google Sheets, ambil jamnya saja.
+            let jamBersih = jamMentah;
+            if (jamMentah.includes("T")) {
+                const potonganJam = jamMentah.match(/T(\d{2}:\d{2}:\d{2})/);
+                jamBersih = potonganJam ? potonganJam[1] : "00:00:00";
+            } else {
+                jamBersih = jamMentah.replace(/\./g, ":");
+                if (/^\d{1,2}:\d{2}$/.test(jamBersih)) jamBersih += ":00";
+                if (!/^\d{1,2}:\d{2}:\d{2}$/.test(jamBersih)) jamBersih = "00:00:00";
+            }
+            const tanggalISO = `${tahun}-${String(bulan).padStart(2,"0")}-${String(hari).padStart(2,"0")}`;
+            const waktuCoba = new Date(`${tanggalISO}T${jamBersih}`);
+            waktu = isNaN(waktuCoba.getTime()) ? new Date().toISOString() : waktuCoba.toISOString();
+        }
+    }
+    if (!waktu || isNaN(new Date(waktu).getTime())) waktu = new Date().toISOString();
+
+    return {
+        id: String(item.id || `${Date.now()}-${Math.random().toString(36).slice(2,8)}`),
+        peralatan: namaAlat || "Peralatan tidak diketahui",
+        alatId: item.alatId || (alatDitemukan ? alatDitemukan.id : ""),
+        kategori: item.kategori || (alatDitemukan ? alatDitemukan.kategori : ""),
+        lokasi: item.lokasi || (alatDitemukan ? alatDitemukan.lokasi : ""),
+        petugas: item.petugas || "-",
+        status: item.status === "Normal" ? "Aktif" : (item.status || "Aktif"),
+        catatan: item.catatan || "Tidak ada catatan",
+        waktu: waktu,
+        pemeriksaan: pemeriksaan
+    };
+}
+
+// Ambil data pusat supaya riwayat dapat tampil di perangkat berbeda.
+async function muatRiwayatDariDatabase(tampilkanPesan = false) {
+    try {
+        const response = await fetch(URL_DATABASE, { method: "GET", cache: "no-store" });
+        if (!response.ok) throw new Error("Respons server tidak berhasil.");
+        const hasil = await response.json();
+        if (!hasil.sukses || !Array.isArray(hasil.data)) {
+            throw new Error(hasil.pesan || "Format data database tidak sesuai.");
+        }
+
+        const dataPusat = hasil.data.map(normalisasiDataDatabase);
+        const gabungan = new Map();
+        // Data pusat dipakai sebagai sumber utama; data lokal dipertahankan bila belum terkirim.
+        dataPusat.forEach(item => gabungan.set(String(item.id), item));
+        riwayatPemeriksaan.forEach(item => {
+            if (!gabungan.has(String(item.id))) gabungan.set(String(item.id), item);
+        });
+        riwayatPemeriksaan = Array.from(gabungan.values()).sort((a, b) =>
+            new Date(b.waktu).getTime() - new Date(a.waktu).getTime()
+        );
+        localStorage.setItem(KUNCI_RIWAYAT, JSON.stringify(riwayatPemeriksaan));
+        perbaruiDashboard();
+        tampilkanRiwayat();
+        tampilkanRekap();
+        if (tampilkanPesan) alert("Riwayat berhasil dimuat dari database SOUTH78.");
+        return true;
+    } catch (error) {
+        console.error("Gagal memuat riwayat dari Google Sheets:", error);
+        if (tampilkanPesan) alert("Riwayat database belum berhasil dimuat. Periksa koneksi internet lalu coba lagi.");
+        return false;
+    }
+}
 
 
 /* =========================================
@@ -1212,7 +1306,13 @@ fetch(URL_GOOGLE_SHEETS, {
     );
 });
 
-         perbaruiDashboard();
+perbaruiDashboard();
+tampilkanRiwayat();
+tampilkanRekap();
+
+alert("Checklist berhasil disimpan!");
+
+        perbaruiDashboard();
 
         if (modeQR) {
             tampilkanRiwayat();
@@ -1225,6 +1325,7 @@ fetch(URL_GOOGLE_SHEETS, {
             bukaHalaman("riwayat");
         }
     });
+
 
 /* =========================================
    7. STATUS DAN FORMAT TANGGAL
@@ -1250,9 +1351,16 @@ function kelasStatus(status) {
     return "";
 }
 
+function labelStatus(status) {
+    if (status === "Aktif" || status === "Normal") return "Normal";
+    if (status === "Tidak Beroperasi") return "Tidak menyala / tidak beroperasi";
+    if (status === "Dalam Perbaikan") return "Dalam perbaikan / sengaja dimatikan";
+    return status || "-";
+}
+
 function badgeStatus(status) {
     return `<span class="status-badge ${kelasStatus(status)}">
-        ${status}
+        ${escapeHTML(labelStatus(status))}
     </span>`;
 }
 
@@ -1263,7 +1371,7 @@ function tampilkanKonfirmasi(hasil, isLastRecord) {
         : "Pemeriksaan Berhasil Disimpan";
     document.getElementById("deskripsiKonfirmasi").textContent = isLastRecord
         ? "Berikut status pemeriksaan terakhir yang tersimpan untuk peralatan pada QR ini."
-        : "Data pemeriksaan kamu berhasil disimpan di browser/perangkat ini.";
+        : "Data pemeriksaan tersimpan dan sedang disinkronkan dengan database SOUTH78.";
 
     const detail = document.getElementById("detailKonfirmasi");
     detail.innerHTML = `
@@ -1554,6 +1662,9 @@ function mulaiAplikasi() {
     if (modeQR) {
         pilihPeralatan(parameterAlat);
     }
+
+    // Memuat riwayat bersama dari Google Sheets setelah tampilan awal siap.
+    muatRiwayatDariDatabase(false);
 }
 
 mulaiAplikasi();
