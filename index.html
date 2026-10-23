@@ -714,9 +714,15 @@ th {
         <section class="page" id="page-riwayat">
             <div class="card">
                 <h2 class="section-title">Riwayat Pemeriksaan</h2>
+                <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-top:-6px">
+                    Pilih peralatan untuk melihat riwayat pemeriksaannya, atau buka semua riwayat untuk melihat seluruh aktivitas.
+                </p>
                 <div class="button-row" style="margin-bottom:16px">
                     <button class="secondary-btn" type="button" onclick="muatRiwayatDariDatabase(true)">Muat Riwayat Terbaru</button>
+                    <button class="primary-btn" type="button" onclick="tampilkanSemuaRiwayat()">Semua Riwayat</button>
                 </div>
+                <div id="daftarRiwayatPeralatan"></div>
+                <div id="tampilanRiwayatAlat" style="display:none"></div>
                 <div class="table-wrap" id="tabelRiwayat"></div>
             </div>
         </section>
@@ -895,6 +901,7 @@ const KUNCI_RIWAYAT = "riwayatPemeriksaan";
 const URL_DATABASE =
     "https://script.google.com/macros/s/AKfycbzMsMTS9iqnhM42GcwQSiwHYd5PY3EN1pGZ1j5EG6rldKHEHOqavte00l1R9fMamLFp/exec";
 let peralatanAktif = null;
+let riwayatAlatDipilih = null;
 
 const parameterAlat = new URLSearchParams(
     window.location.search
@@ -1448,53 +1455,128 @@ function perbaruiDashboard() {
 
 function tampilkanRiwayat() {
     const area = document.getElementById("tabelRiwayat");
-    const dataRiwayat = modeQR
-        ? riwayatPemeriksaan.filter(item => item.alatId === parameterAlat)
-        : riwayatPemeriksaan;
+    const daftar = document.getElementById("daftarRiwayatPeralatan");
+    const detail = document.getElementById("tampilanRiwayatAlat");
 
-    let tombolKembali = "";
+    // Jika dibuka melalui QR, langsung tampilkan riwayat peralatan dari QR tersebut.
     if (modeQR) {
-        tombolKembali = '<div class="button-row" style="margin-top:0;margin-bottom:16px"><button class="secondary-btn" type="button" onclick="kembaliKeChecklistQR()">Kembali ke Checklist</button></div>';
-    }
-
-    if (dataRiwayat.length === 0) {
-        area.innerHTML = tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan.</div>';
+        daftar.style.display = "none";
+        detail.style.display = "none";
+        area.style.display = "block";
+        const dataQR = riwayatPemeriksaan.filter(item => item.alatId === parameterAlat);
+        area.innerHTML = renderTabelRiwayat(dataQR, true);
         return;
     }
 
-    const tabel = `
+    area.style.display = "none";
+    daftar.style.display = riwayatAlatDipilih ? "none" : "block";
+    detail.style.display = riwayatAlatDipilih ? "block" : "none";
+
+    if (riwayatAlatDipilih === "__semua__") {
+        detail.innerHTML = `
+            <div class="button-row" style="margin-bottom:16px">
+                <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
+            </div>
+            <h3 style="margin:0 0 16px">Semua Riwayat Pemeriksaan</h3>
+            ${renderTabelRiwayat(riwayatPemeriksaan, false)}
+        `;
+        return;
+    }
+
+    if (riwayatAlatDipilih) {
+        const alat = daftarAlat.find(item => item.id === riwayatAlatDipilih);
+        const dataAlat = riwayatPemeriksaan.filter(item => item.alatId === riwayatAlatDipilih);
+        detail.innerHTML = `
+            <div class="button-row" style="margin-bottom:16px">
+                <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
+                <button class="secondary-btn" type="button" onclick="tampilkanSemuaRiwayat()">Semua Riwayat</button>
+            </div>
+            <h3 style="margin:0 0 5px">${escapeHTML(alat ? alat.nama : "Riwayat Peralatan")}</h3>
+            <p style="font-size:13px;color:var(--muted);margin:0 0 16px">${escapeHTML(alat ? alat.lokasi : "")}</p>
+            ${renderTabelRiwayat(dataAlat, false)}
+        `;
+        return;
+    }
+
+    daftar.innerHTML = `
+        <div class="grid">
+            ${daftarAlat.map(alat => {
+                const jumlah = riwayatPemeriksaan.filter(item => item.alatId === alat.id).length;
+                return `
+                    <div class="card equipment-card">
+                        <div class="equipment-icon">${alat.ikon}</div>
+                        <h3>${escapeHTML(alat.nama)}</h3>
+                        <p>${escapeHTML(alat.lokasi)}</p>
+                        <p>${jumlah} pemeriksaan tersimpan</p>
+                        <button class="primary-btn full-btn" type="button" onclick="bukaRiwayatPeralatan('${alat.id}')">Buka Riwayat</button>
+                    </div>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+function bukaRiwayatPeralatan(id) {
+    riwayatAlatDipilih = id;
+    tampilkanRiwayat();
+}
+
+function kembaliKeDaftarRiwayat() {
+    riwayatAlatDipilih = null;
+    tampilkanRiwayat();
+}
+
+function tampilkanSemuaRiwayat() {
+    riwayatAlatDipilih = "__semua__";
+    const area = document.getElementById("tabelRiwayat");
+    const daftar = document.getElementById("daftarRiwayatPeralatan");
+    const detail = document.getElementById("tampilanRiwayatAlat");
+    if (modeQR) {
+        tampilkanRiwayat();
+        return;
+    }
+    daftar.style.display = "none";
+    detail.style.display = "block";
+    area.style.display = "none";
+    detail.innerHTML = `
+        <div class="button-row" style="margin-bottom:16px">
+            <button class="secondary-btn" type="button" onclick="kembaliKeDaftarRiwayat()">← Kembali ke Daftar Peralatan</button>
+        </div>
+        <h3 style="margin:0 0 16px">Semua Riwayat Pemeriksaan</h3>
+        ${renderTabelRiwayat(riwayatPemeriksaan, false)}
+    `;
+}
+
+function renderTabelRiwayat(dataRiwayat, modeQRView) {
+    let tombolKembali = "";
+    if (modeQRView) {
+        tombolKembali = '<div class="button-row" style="margin-top:0;margin-bottom:16px"><button class="secondary-btn" type="button" onclick="kembaliKeChecklistQR()">Kembali ke Checklist</button></div>';
+    }
+    if (!dataRiwayat.length) {
+        return tombolKembali + '<div class="empty-state">Belum ada riwayat pemeriksaan untuk pilihan ini.</div>';
+    }
+    return tombolKembali + `
+        <div class="table-wrap">
         <table>
-            <thead>
-                <tr>
-                    <th>Waktu</th>
-                    <th>Peralatan</th>
-                    <th>Petugas</th>
-                    <th>Status</th>
-                    <th>Checklist</th>
-                    <th>Catatan</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Waktu</th><th>Peralatan</th><th>Petugas</th><th>Status</th><th>Checklist</th><th>Catatan</th></tr></thead>
             <tbody>
                 ${dataRiwayat.map(item => {
-                    const total = (item.pemeriksaan || []).length;
-                    const selesai = (item.pemeriksaan || [])
-                        .filter(p => p.selesai).length;
-
-                    return `
-                        <tr>
-                            <td>${formatTanggal(item.waktu)}</td>
-                            <td>${escapeHTML(item.peralatan || "-")}</td>
-                            <td>${escapeHTML(item.petugas || "-")}</td>
-                            <td>${badgeStatus(item.status || "Aktif")}</td>
-                            <td>${selesai}/${total} poin</td>
-                            <td>${escapeHTML(item.catatan || "-")}</td>
-                        </tr>
-                    `;
+                    const pemeriksaan = Array.isArray(item.pemeriksaan) ? item.pemeriksaan : [];
+                    const total = pemeriksaan.length;
+                    const selesai = pemeriksaan.filter(p => p.selesai).length;
+                    return `<tr>
+                        <td>${formatTanggal(item.waktu)}</td>
+                        <td>${escapeHTML(item.peralatan || "-")}</td>
+                        <td>${escapeHTML(item.petugas || "-")}</td>
+                        <td>${badgeStatus(item.status || "Aktif")}</td>
+                        <td>${selesai}/${total} poin</td>
+                        <td>${escapeHTML(item.catatan || "-")}</td>
+                    </tr>`;
                 }).join("")}
             </tbody>
         </table>
+        </div>
     `;
-    area.innerHTML = tombolKembali + tabel;
 }
 
 /* =========================================
