@@ -554,9 +554,9 @@ th {
         <button class="nav-btn active" data-page="dashboard"
                 onclick="bukaHalaman('dashboard')">Dashboard</button>
         <button class="nav-btn" data-page="peralatan"
-                onclick="bukaHalaman('peralatan')">Checklist Peralatan</button>
+                onclick="bukaHalaman('peralatan')">Checklist Operational</button>
         <button class="nav-btn" data-page="riwayat"
-                onclick="bukaHalaman('riwayat')">Riwayat Pemeriksaan</button>
+                onclick="bukaHalaman('riwayat')">Riwayat Checklist</button>
         <button class="nav-btn" data-page="rekap"
                 onclick="bukaHalaman('rekap')">Rekap Laporan</button>
         <button class="nav-btn" data-page="pengaturan"
@@ -889,7 +889,8 @@ const daftarAlat = [
 ========================================= */
 
 const KUNCI_RIWAYAT = "riwayatPemeriksaan";
-
+const URL_DATABASE =
+    "https://script.google.com/macros/s/AKfycbzMsMTS9iqnhM42GcwQSiwHYd5PY3EN1pGZ1j5EG6rldKHEHOqavte00l1R9fMamLFp/exec";
 let peralatanAktif = null;
 
 const parameterAlat = new URLSearchParams(
@@ -932,10 +933,10 @@ let riwayatPemeriksaan = bacaRiwayat();
 
 const namaHalaman = {
     dashboard: "Dashboard",
-    peralatan: "Checklist Peralatan",
+    peralatan: "Checklist Operational",
     checklist: "Checklist Pemeriksaan",
     sukses: "Konfirmasi Pemeriksaan",
-    riwayat: "Riwayat Pemeriksaan",
+    riwayat: "Riwayat Checklist",
     rekap: "Rekap Laporan",
     pengaturan: "Pengaturan"
 };
@@ -1160,31 +1161,70 @@ document.getElementById("formChecklist")
             pemeriksaan: pemeriksaan
         };
 
-        riwayatPemeriksaan.unshift(hasil);
+      riwayatPemeriksaan.unshift(hasil);
 
-        try {
-            localStorage.setItem(
-                KUNCI_RIWAYAT,
-                JSON.stringify(riwayatPemeriksaan)
-            );
-        } catch (error) {
-            riwayatPemeriksaan.shift();
-            alert("Data tidak berhasil disimpan di browser ini.");
-            return;
-        }
+try {
+    localStorage.setItem(
+        KUNCI_RIWAYAT,
+        JSON.stringify(riwayatPemeriksaan)
+    );
+} catch (error) {
+    riwayatPemeriksaan.shift();
+    alert("Data tidak berhasil disimpan di browser ini.");
+    return;
+}
 
-        perbaruiDashboard();
+// Kirim data pemeriksaan ke Google Sheets
+const URL_GOOGLE_SHEETS =
+    "https://script.google.com/macros/s/AKfycbzMsMTS9iqnhM42GcwQSiwHYd5PY3EN1pGZ1j5EG6rldKHEHOqavte00l1R9fMamLFp/exec";
+
+const waktuPemeriksaan = new Date(hasil.waktu);
+
+fetch(URL_GOOGLE_SHEETS, {
+    method: "POST",
+    body: JSON.stringify({
+        id: hasil.id,
+        tanggal: waktuPemeriksaan.toLocaleDateString("id-ID"),
+        waktu: waktuPemeriksaan.toLocaleTimeString("id-ID"),
+        petugas: hasil.petugas,
+        peralatan: hasil.peralatan,
+        lokasi: hasil.lokasi,
+        status: hasil.status,
+        catatan: hasil.catatan,
+        detailChecklist: hasil.pemeriksaan
+    })
+})
+.then(response => response.json())
+.then(data => {
+    if (data.sukses) {
+        console.log("Data berhasil dikirim ke Google Sheets.");
+    } else {
+        console.error("Google Sheets:", data.pesan);
+        alert(
+            "Data tersimpan di browser, tetapi gagal masuk Google Sheets."
+        );
+    }
+})
+.catch(error => {
+    console.error("Gagal mengirim ke Google Sheets:", error);
+    alert(
+        "Data tersimpan di browser, tetapi koneksi ke Google Sheets gagal."
+    );
+});
+
+         perbaruiDashboard();
 
         if (modeQR) {
             tampilkanRiwayat();
             tampilkanRekap();
             tampilkanKonfirmasi(hasil, false);
         } else {
+            tampilkanRiwayat();
+            tampilkanRekap();
             alert("Pemeriksaan berhasil disimpan.");
             bukaHalaman("riwayat");
         }
     });
-
 
 /* =========================================
    7. STATUS DAN FORMAT TANGGAL
